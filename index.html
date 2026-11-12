@@ -4,173 +4,258 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grownilgo</title>
-    <!-- Официальный скрипт Telegram для Mini Apps -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap');
+
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f0f9ff;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+            height: 100vh;
+            overflow: hidden;
+            color: #1e293b;
+            user-select: none;
+        }
+
+        /* Контейнеры экранов */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            overflow: hidden;
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
-        h1 { color: #333; }
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+
+        /* --- ЭКРАН 1: ОНБОРДИНГ --- */
         
-        /* Контейнер дерева */
-        .tree-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.5s ease;
-            padding: 20px 0;
-        }
-        .tree-trunk {
-            position: relative;
-            width: 20px;
-            height: 150px;
-            background: #8B5A2B;
-            border-radius: 10px;
-            transition: all 0.5s ease;
-        }
-        .branch {
+        /* Конфетти */
+        .confetti {
             position: absolute;
-            width: 60px;
-            height: 4px;
-            background: #8B5A2B;
+            width: 10px;
+            height: 10px;
+            background-color: #fbbf24;
             border-radius: 2px;
-            transition: all 0.5s ease;
+            animation: fall 3s linear forwards;
+            opacity: 0;
         }
-        .branch-left {
-            top: 40px;
-            left: -50px;
-            transform: rotate(-30deg);
-            transform-origin: right center;
+        @keyframes fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
-        .branch-right {
-            top: 70px;
-            right: -50px;
-            transform: rotate(30deg);
-            transform-origin: left center;
+
+        /* Горшок */
+        .pot {
+            width: 120px;
+            height: 80px;
+            background: #b45309;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            margin-top: 50px;
+            opacity: 0;
+            animation: popIn 0.5s 0.5s forwards;
+            box-shadow: inset 0 -10px 0 rgba(0,0,0,0.1);
         }
-        .leaf {
+        .pot::before {
+            content: '';
             position: absolute;
-            width: 15px;
-            height: 15px;
-            background: #4CAF50;
+            top: -10px; left: -10px; right: -10px; height: 20px;
+            background: #92400e;
+            border-radius: 10px;
+        }
+        
+        /* Семечка */
+        .seed {
+            position: absolute;
+            top: 20px;
+            left: 55px;
+            width: 10px;
+            height: 14px;
+            background: #78350f;
+            border-radius: 50%;
+            opacity: 0;
+            animation: dropSeed 0.6s 1.2s forwards, hideSeed 0.1s 1.9s forwards;
+        }
+
+        /* Росток */
+        .sprout {
+            position: absolute;
+            bottom: 75px;
+            left: 55px;
+            width: 10px;
+            height: 40px;
+            background: #22c55e;
+            border-radius: 10px 10px 0 0;
+            transform-origin: bottom center;
+            transform: scaleY(0);
+            animation: growSprout 0.8s 2s forwards;
+        }
+        .sprout::before, .sprout::after {
+            content: '';
+            position: absolute;
+            width: 25px; height: 25px;
+            background: #4ade80;
             border-radius: 50% 0 50% 50%;
-            transition: all 1s ease;
+            top: 5px;
         }
-        .branch-left .leaf-1 { top: -15px; left: 0; }
-        .branch-left .leaf-2 { top: -5px; left: 15px; }
-        .branch-right .leaf-3 { top: -15px; right: 0; }
-        .branch-right .leaf-4 { top: -5px; right: 15px; }
+        .sprout::before { left: -20px; transform: rotate(-20deg); }
+        .sprout::after { right: -20px; transform: rotate(110deg); }
 
-        /* Состояние увядания */
-        .withered .leaf {
-            background: #A0522D;
-            transform: scale(0.5) rotate(90deg);
-            opacity: 0.3;
+        /* Текст и кнопка онбординга */
+        .onboarding-text {
+            font-size: 32px;
+            font-weight: 800;
+            margin-top: 40px;
+            opacity: 0;
+            animation: fadeInUp 0.5s 2.8s forwards;
         }
-        .withered .branch-left {
-            transform: rotate(-50deg);
-            opacity: 0.6;
-        }
-        .withered .branch-right {
-            transform: rotate(50deg);
-            opacity: 0.6;
-        }
-
-        .withered-message {
+        .onboarding-btn {
             margin-top: 20px;
-            color: #FFA500;
-            font-weight: bold;
-            text-align: center;
-            display: none; /* Скрыто по умолчанию */
-        }
-        .withered .withered-message {
-            display: block;
-            animation: pulse 2s infinite;
+            opacity: 0;
+            animation: fadeInUp 0.5s 3.2s forwards;
         }
 
-        /* Кнопка */
-        button {
-            margin-top: 30px;
-            padding: 12px 24px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: none;
-            background: #4CAF50;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        button:active { transform: scale(0.95); }
+        @keyframes popIn { to { opacity: 1; transform: translateY(0); } }
+        @keyframes dropSeed { 0% { transform: translateY(-50px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes hideSeed { to { opacity: 0; } }
+        @keyframes growSprout { to { transform: scaleY(1); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Анимация покачивания живого дерева */
-        .alive .branch-left { animation: sway 3s ease-in-out infinite alternate; }
-        .alive .branch-right { animation: sway 3s ease-in-out infinite alternate-reverse; }
-        @keyframes sway {
-            from { transform: rotate(-30deg); }
-            to { transform: rotate(-25deg); }
+        /* --- ЭКРАН 2: ГЛАВНЫЙ --- */
+        .header { text-align: center; margin-top: 40px; }
+        .header h1 { font-size: 32px; font-weight: 800; margin: 0; color: #0f172a; }
+        
+        .tree-scene {
+            position: relative;
+            width: 250px; height: 300px;
+            display: flex; justify-content: center; align-items: flex-end;
+            margin-top: 20px;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+        .tree-svg {
+            width: 100%; height: 100%;
+            transition: all 0.8s ease;
+            transform-origin: bottom center;
         }
+        .alive .tree-svg { animation: sway 4s ease-in-out infinite alternate; }
+        @keyframes sway { 0% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
+
+        .trunk { fill: #854d0e; transition: fill 0.5s; }
+        .leaf { fill: #22c55e; transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
+        
+        .withered .trunk { fill: #57534e; }
+        .withered .leaf { fill: #a8a29e; transform: translateY(150px) rotate(90deg) scale(0.5); opacity: 0; }
+
+        /* Кнопки (общий стиль Дуолинго) */
+        .action-btn {
+            width: 90%; max-width: 350px; padding: 18px;
+            font-size: 18px; font-family: 'Nunito', sans-serif; font-weight: 800;
+            color: white; background-color: #22c55e;
+            border: none; border-radius: 16px;
+            box-shadow: 0 6px 0 #166534;
+            cursor: pointer; transition: all 0.1s ease;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .action-btn:active { transform: translateY(6px); box-shadow: 0 0px 0 #166534; }
+        .btn-container { width: 100%; padding: 20px; display: flex; justify-content: center; margin-bottom: 30px; }
     </style>
 </head>
 <body>
 
-    <h1>Grownilgo 🌳</h1>
-
-    <!-- Наше дерево (класс "alive" ставим по умолчанию) -->
-    <div class="tree-container alive" id="treeContainer">
-        <div class="tree-trunk">
-            <div class="branch branch-left">
-                <div class="leaf leaf-1"></div>
-                <div class="leaf leaf-2"></div>
-                <div class="leaf leaf-3"></div>
-            </div>
-            <div class="branch branch-right">
-                <div class="leaf leaf-4"></div>
-                <div class="leaf leaf-5"></div>
-            </div>
+    <!-- ЭКРАН 1: ОНБОРДИНГ -->
+    <div id="onboarding-screen" class="screen">
+        <div class="pot">
+            <div class="seed"></div>
+            <div class="sprout"></div>
         </div>
-        <p class="withered-message">Ветки засохли... Вернись и оживи дерево знаниями! 🌱</p>
+        <div class="onboarding-text">День 1</div>
+        <div class="onboarding-btn">
+            <button class="action-btn" id="start-btn">Изучать английский</button>
+        </div>
     </div>
 
-    <button id="actionBtn">Проверить, как сохнет</button>
+    <!-- ЭКРАН 2: ГЛАВНЫЙ ЭКРАН С ДЕРЕВОМ -->
+    <div id="main-screen" class="screen hidden">
+        <div class="header">
+            <h1>Grownilgo 🌳</h1>
+        </div>
+
+        <div class="tree-scene alive" id="treeContainer">
+            <svg class="tree-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+                <path class="trunk" d="M90,250 L110,250 L105,130 L95,130 Z" />
+                <path class="trunk" d="M100,160 L60,130 L55,140 L100,170 Z" />
+                <path class="trunk" d="M100,180 L140,140 L145,150 L100,190 Z" />
+                <circle class="leaf" cx="100" cy="100" r="45" />
+                <circle class="leaf" cx="60" cy="120" r="35" />
+                <circle class="leaf" cx="140" cy="120" r="35" />
+                <circle class="leaf" cx="80" cy="70" r="30" />
+                <circle class="leaf" cx="120" cy="70" r="30" />
+                <circle class="leaf" cx="85" cy="85" r="15" opacity="0.4" fill="#a3e635" />
+                <circle class="leaf" cx="130" cy="105" r="10" opacity="0.4" fill="#a3e635" />
+            </svg>
+        </div>
+
+        <div class="btn-container">
+            <button class="action-btn" id="actionBtn">Проверить, как сохнет</button>
+        </div>
+    </div>
 
     <script>
-        // 1. Инициализация Telegram Mini App
+        // 1. Инициализация Telegram
         const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand(); // Разворачиваем на весь экран
-        }
+        if (tg) { tg.ready(); tg.expand(); }
 
-        // 2. Логика работы кнопки и дерева
+        // 2. Генерация конфетти при загрузке
+        function createConfetti() {
+            const colors = ['#fbbf24', '#f87171', '#60a5fa', '#34d399', '#a78bfa'];
+            for (let i = 0; i < 40; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.getElementById('onboarding-screen').appendChild(confetti);
+            }
+        }
+        createConfetti();
+
+        // 3. Логика переключения экранов
+        const onboardingScreen = document.getElementById('onboarding-screen');
+        const mainScreen = document.getElementById('main-screen');
+        
+        document.getElementById('start-btn').addEventListener('click', () => {
+            // Прячем онбординг, показываем главный экран
+            onboardingScreen.classList.add('hidden');
+            setTimeout(() => {
+                mainScreen.classList.remove('hidden');
+            }, 500); // Ждем, пока исчезнет первый экран
+        });
+
+        // 4. Логика увядания дерева на главном экране
         const treeContainer = document.getElementById('treeContainer');
         const actionBtn = document.getElementById('actionBtn');
 
         actionBtn.addEventListener('click', () => {
-            // Если дерево живое - делаем его сухим
             if (treeContainer.classList.contains('alive')) {
                 treeContainer.classList.remove('alive');
                 treeContainer.classList.add('withered');
                 actionBtn.textContent = 'Оживить дерево';
-            } 
-            // Если сухое - возвращаем к жизни
-            else {
+                actionBtn.style.backgroundColor = '#3b82f6';
+                actionBtn.style.boxShadow = '0 6px 0 #1e3a8a';
+            } else {
                 treeContainer.classList.remove('withered');
                 treeContainer.classList.add('alive');
                 actionBtn.textContent = 'Проверить, как сохнет';
+                actionBtn.style.backgroundColor = '#22c55e';
+                actionBtn.style.boxShadow = '0 6px 0 #166534';
             }
         });
     </script>
