@@ -2,53 +2,58 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Grownilgo - День 1</title>
+<title>Grownilgo - Day 1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+  :root{
+    --key: transparent;
+  }
 
   *{ box-sizing: border-box; }
   html, body{
-    margin: 0; padding: 0; height: 100%;
-    /* Наш красивый фон неба вместо хромакея */
+    margin: 0;
+    height: 100%;
+    /* Наш фон неба для Telegram */
     background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
-    display: grid; place-items: center;
-    font-family: 'Nunito', sans-serif;
+    display: grid;
+    place-items: center;
+    font-family: sans-serif;
     overflow: hidden;
-    user-select: none;
   }
 
-  /* --- ЭКРАН 1: АНИМАЦИЯ --- */
-  #intro-screen {
+  /* Обертка для плавного скрытия всего экрана онбординга */
+  #intro-wrapper {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    display: flex; justify-content: center; align-items: center;
     transition: opacity 0.6s ease;
     z-index: 10;
   }
-  #intro-screen.hidden {
+  #intro-wrapper.hidden {
     opacity: 0; pointer-events: none;
   }
 
+  /* --- ОРИГИНАЛЬНЫЙ КОД ИИ (без изменений) --- */
   .stage{
     position: relative;
-    width: 100vw; /* Адаптивно под экран */
-    height: 75vh;
-    max-width: 420px;
+    width: 420px;
+    height: 620px;
+    background: var(--key);
     overflow: hidden;
-    display: flex; justify-content: center;
   }
 
   .scene{
-    position: absolute; left: 0; right: 0; top: 0; bottom: 80px;
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 60px;
   }
 
-  /* ================= ТЕНЬ ================= */
   .shadow{
-    position: absolute; left: 50%; bottom: 70px;
-    width: 180px; height: 28px; margin-left: -90px;
+    position: absolute;
+    left: 50%; bottom: 70px;
+    width: 180px; height: 28px;
+    margin-left: -90px;
     border-radius: 50%;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,.25) 0%, rgba(0,0,0,.10) 45%, rgba(0,0,0,0) 72%);
+    background: radial-gradient(ellipse at center, rgba(0,0,0,.42) 0%, rgba(0,0,0,.20) 45%, rgba(0,0,0,0) 72%);
     transform-origin: center;
     animation: shadowIn 5s 1 forwards;
   }
@@ -58,10 +63,11 @@
     15%, 100% { opacity: 1; transform: scale(1); }
   }
 
-  /* ================= ГОРШОК ================= */
   .pot-wrap{
-    position: absolute; left: 50%; bottom: 80px;
-    width: 140px; height: 110px; margin-left: -70px;
+    position: absolute;
+    left: 50%; bottom: 80px;
+    width: 140px; height: 110px;
+    margin-left: -70px;
     transform-origin: 50% 100%;
     animation: potDrop 5s 1 forwards;
   }
@@ -112,7 +118,6 @@
     background: radial-gradient(circle at 30% 46%, rgba(255,220,170,.16) 0 1.4px, transparent 1.9px), radial-gradient(circle at 55% 30%, rgba(0,0,0,.30) 0 1.8px, transparent 2.3px), radial-gradient(circle at 73% 62%, rgba(255,220,170,.12) 0 1.2px, transparent 1.7px), radial-gradient(circle at 42% 70%, rgba(0,0,0,.26) 0 1.6px, transparent 2.1px), radial-gradient(circle at 62% 52%, rgba(255,220,170,.10) 0 1.1px, transparent 1.5px);
   }
 
-  /* ================= ПЫЛЬ ================= */
   .dust i{
     position: absolute; left: 50%; bottom: 84px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: #8a5a26; opacity: 0; animation: puff 5s 1 forwards;
   }
@@ -128,7 +133,6 @@
     22%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.22); }
   }
 
-  /* ================= СЕМЕЧКО ================= */
   .seed{
     position: absolute; left: 50%; bottom: 186px; width: 18px; height: 13px; margin-left: -9px; z-index: 20;
     border-radius: 60% 40% 45% 55% / 70% 65% 35% 30%;
@@ -148,7 +152,6 @@
     42%, 100% { opacity: 0; transform: translateY(12px) rotate(315deg) scale(.9); }
   }
 
-  /* ================= РОСТОК ================= */
   .sprout-svg{
     position: absolute; left: 50%; bottom: 184px; width: 140px; height: 200px; margin-left: -70px; overflow: visible; z-index: 30;
   }
@@ -170,58 +173,56 @@
     50%  { transform: rotate(1.7deg); }
     100% { transform: rotate(-1.7deg); }
   }
-
-  .stem-path, .stem-hi { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawStem 5s 1 forwards; }
+  .stem-path, .stem-hi{ stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawStem 5s 1 forwards; }
   @keyframes drawStem{ 0%, 44% { stroke-dashoffset: 100; } 66%, 100% { stroke-dashoffset: 0; } }
-  
   .stem-node{ opacity: 0; animation: nodeIn 5s 1 forwards; }
   @keyframes nodeIn{ 0%, 56% { opacity: 0; } 64%, 100% { opacity: .85; } }
-  
   .leaf-left{ transform-box: fill-box; transform-origin: 100% 100%; animation: leafL 5s 1 forwards; }
   @keyframes leafL{ 0%, 57% { opacity: 0; transform: scale(.04) rotate(-12deg); } 64% { opacity: 1; transform: scale(1.14) rotate(2deg); } 68%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
-  
   .leaf-right{ transform-box: fill-box; transform-origin: 0% 100%; animation: leafR 5s 1 forwards; }
   @keyframes leafR{ 0%, 61% { opacity: 0; transform: scale(.04) rotate(12deg); } 68% { opacity: 1; transform: scale(1.14) rotate(-2deg); } 72%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
-  
   .leaf-bud{ transform-box: fill-box; transform-origin: 50% 100%; animation: leafB 5s 1 forwards; }
   @keyframes leafB{ 0%, 67% { opacity: 0; transform: scale(.04) rotate(8deg); } 74% { opacity: 1; transform: scale(1.16) rotate(-2deg); } 78%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
 
-  /* ================= ТЕКСТ И КНОПКА ================= */
+  /* Оригинальный текст и кнопка от ИИ */
   .caption{
-    text-align: center; opacity: 0;
+    position: absolute;
+    left: 0; right: 0; bottom: 16px;
+    text-align: center;
+    opacity: 0;
     animation: capIn .9s cubic-bezier(.22,.9,.3,1) 5.2s 1 forwards;
-    margin-bottom: 50px;
   }
-  @keyframes capIn{ from{ opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
+  @keyframes capIn{
+    from{ opacity: 0; transform: translateY(16px) scale(.96); }
+    to  { opacity: 1; transform: translateY(0) scale(1); }
+  }
   .day{
-    font-size: 42px; font-weight: 900; color: #1e293b;
-    margin-bottom: 20px;
-    text-shadow: 0 2px 4px rgba(255,255,255,0.5);
+    font: 800 46px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: #fff;
+    letter-spacing: .5px;
+    text-shadow: 0 3px 12px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.45);
   }
-
   .cta{
-    display: inline-block; padding: 18px 36px;
-    font-size: 18px; font-family: 'Nunito', sans-serif; font-weight: 900;
-    color: white; background-color: #58cc02;
-    border: none; border-radius: 16px;
-    box-shadow: 0 8px 0 #46a302;
-    cursor: pointer; transition: all 0.1s ease;
-    text-transform: uppercase; letter-spacing: 1px;
+    display: inline-block; margin-top: 12px; padding: 11px 26px;
+    border: 0; border-radius: 999px;
+    font: 600 16px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: #f2fff2; background: linear-gradient(180deg, #2c9a2c, #145214);
+    box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.25);
+    cursor: pointer; transition: transform .18s ease, box-shadow .18s ease;
   }
-  .cta:active { transform: translateY(8px); box-shadow: 0 0px 0 #46a302; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 9px 18px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.3); }
+  .cta:active { transform: translateY(0); }
 
-  /* --- ЭКРАН 2: ГЛАВНЫЙ (ДЕРЕВО) --- */
+  /* --- ВТОРОЙ ЭКРАН (ДЕРЕВО) --- */
   #main-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 5;
   }
   #main-screen.active { opacity: 1; pointer-events: auto; }
+  #main-screen h1 { font-family: sans-serif; font-size: 34px; font-weight: 900; margin-top: 50px; color: #1e293b; }
   
-  #main-screen h1 { font-size: 34px; font-weight: 900; margin-top: 50px; color: #1e293b;}
-  
-  /* Дерево (взято из прошлого шага) */
   .tree-scene { position: relative; width: 280px; height: 320px; display: flex; justify-content: center; align-items: flex-end; margin-top: 10px; }
   .tree-svg { width: 100%; height: 100%; transition: all 0.8s ease; transform-origin: bottom center; }
   .alive .tree-svg { animation: sway 4s ease-in-out infinite alternate; }
@@ -233,7 +234,7 @@
 
   .action-btn {
       width: 85%; max-width: 350px; padding: 18px; margin-top: 30px;
-      font-size: 18px; font-family: 'Nunito', sans-serif; font-weight: 900;
+      font-size: 18px; font-family: sans-serif; font-weight: 900;
       color: white; background-color: #58cc02;
       border: none; border-radius: 16px;
       box-shadow: 0 8px 0 #46a302;
@@ -244,8 +245,8 @@
 </head>
 <body>
 
-  <!-- ЭКРАН 1: АНИМАЦИЯ -->
-  <div id="intro-screen">
+  <!-- ЭКРАН 1: ОРИГИНАЛЬНЫЙ ОНБОРДИНГ -->
+  <div id="intro-wrapper">
     <div class="stage">
       <div class="scene">
         <div class="shadow"></div>
@@ -283,15 +284,15 @@
           </g>
         </svg>
       </div>
-    </div>
-
-    <div class="caption">
-      <div class="day">День 1 🔥</div>
-      <button type="button" class="cta" id="start-btn">Начать заниматься</button>
+      <!-- Оригинальный текст -->
+      <div class="caption">
+        <div class="day">Day 1</div>
+        <div><button type="button" class="cta" id="start-btn">Начать заниматься</button></div>
+      </div>
     </div>
   </div>
 
-  <!-- ЭКРАН 2: ГЛАВНЫЙ -->
+  <!-- ЭКРАН 2: ДЕРЕВО -->
   <div id="main-screen">
     <h1>Grownilgo 🌳</h1>
     <div class="tree-scene alive" id="treeContainer">
@@ -312,19 +313,18 @@
   </div>
 
   <script>
-    // 1. Инициализация Telegram
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.ready(); tg.expand(); }
 
-    // 2. Переход на главный экран
+    // Переход по кнопке
     document.getElementById('start-btn').addEventListener('click', () => {
-        document.getElementById('intro-screen').classList.add('hidden');
+        document.getElementById('intro-wrapper').classList.add('hidden');
         setTimeout(() => {
             document.getElementById('main-screen').classList.add('active');
         }, 400);
     });
 
-    // 3. Логика увядания дерева (для второго экрана)
+    // Логика увядания дерева
     const treeContainer = document.getElementById('treeContainer');
     const actionBtn = document.getElementById('actionBtn');
 
