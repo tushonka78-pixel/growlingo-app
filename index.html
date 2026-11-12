@@ -6,182 +6,145 @@
     <title>Grownilgo</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Nunito', sans-serif;
-            background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+            /* Красивый градиент неба */
+            background: linear-gradient(180deg, #7dd3fc 0%, #e0f2fe 50%, #f8fafc 100%);
             height: 100vh;
             overflow: hidden;
-            color: #1e293b;
+            color: #0f172a;
             user-select: none;
         }
 
-        /* Контейнеры экранов */
-        .screen {
+        /* Анимация облаков на фоне */
+        .clouds {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.8) 0%, transparent 40%),
+                radial-gradient(circle at 80% 30%, rgba(255,255,255,0.6) 0%, transparent 30%),
+                radial-gradient(circle at 50% 10%, rgba(255,255,255,0.7) 0%, transparent 35%);
+            animation: moveClouds 20s linear infinite alternate;
+            z-index: 0;
+        }
+        @keyframes moveClouds {
+            0% { transform: translateX(-10%); }
+            100% { transform: translateX(10%); }
+        }
+
+        /* Экраны */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.5s ease, transform 0.5s ease;
+            z-index: 1;
         }
         .hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.95);
+            opacity: 0; pointer-events: none; transform: scale(0.95);
         }
 
-        /* --- ЭКРАН 1: ОНБОРДИНГ --- */
-        
-        /* Конфетти */
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #fbbf24;
-            border-radius: 2px;
-            animation: fall 3s linear forwards;
-            opacity: 0;
-        }
-        @keyframes fall {
-            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
-
-        /* Горшок */
-        .pot {
-            width: 120px;
-            height: 80px;
-            background: #b45309;
-            border-radius: 0 0 20px 20px;
+        /* --- ОНБОРДИНГ --- */
+        .pot-container {
             position: relative;
-            margin-top: 50px;
+            font-size: 120px; /* Размер эмодзи-горшка */
+            line-height: 1;
+            filter: drop-shadow(0px 15px 10px rgba(0,0,0,0.15));
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             opacity: 0;
-            animation: popIn 0.5s 0.5s forwards;
-            box-shadow: inset 0 -10px 0 rgba(0,0,0,0.1);
         }
-        .pot::before {
-            content: '';
+        .sprout-emoji {
             position: absolute;
-            top: -10px; left: -10px; right: -10px; height: 20px;
-            background: #92400e;
-            border-radius: 10px;
-        }
-        
-        /* Семечка */
-        .seed {
-            position: absolute;
-            top: 20px;
-            left: 55px;
-            width: 10px;
-            height: 14px;
-            background: #78350f;
-            border-radius: 50%;
+            top: -40px; left: 30px;
+            font-size: 60px;
             opacity: 0;
-            animation: dropSeed 0.6s 1.2s forwards, hideSeed 0.1s 1.9s forwards;
+            transform: scale(0);
+            animation: growSprout 0.8s 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        /* Росток */
-        .sprout {
-            position: absolute;
-            bottom: 75px;
-            left: 55px;
-            width: 10px;
-            height: 40px;
-            background: #22c55e;
-            border-radius: 10px 10px 0 0;
-            transform-origin: bottom center;
-            transform: scaleY(0);
-            animation: growSprout 0.8s 2s forwards;
-        }
-        .sprout::before, .sprout::after {
-            content: '';
-            position: absolute;
-            width: 25px; height: 25px;
-            background: #4ade80;
-            border-radius: 50% 0 50% 50%;
-            top: 5px;
-        }
-        .sprout::before { left: -20px; transform: rotate(-20deg); }
-        .sprout::after { right: -20px; transform: rotate(110deg); }
-
-        /* Текст и кнопка онбординга */
         .onboarding-text {
-            font-size: 32px;
-            font-weight: 800;
+            font-size: 36px;
+            font-weight: 900;
             margin-top: 40px;
+            color: #1e293b;
+            display: flex; align-items: center; gap: 10px;
             opacity: 0;
-            animation: fadeInUp 0.5s 2.8s forwards;
+            animation: fadeInUp 0.5s 1.5s forwards;
         }
+        .fire-icon { font-size: 40px; animation: pulse 1s infinite alternate; }
+        
         .onboarding-btn {
-            margin-top: 20px;
             opacity: 0;
-            animation: fadeInUp 0.5s 3.2s forwards;
+            animation: fadeInUp 0.5s 1.8s forwards;
+            width: 100%; display: flex; justify-content: center; margin-top: 30px;
         }
 
-        @keyframes popIn { to { opacity: 1; transform: translateY(0); } }
-        @keyframes dropSeed { 0% { transform: translateY(-50px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
-        @keyframes hideSeed { to { opacity: 0; } }
-        @keyframes growSprout { to { transform: scaleY(1); } }
+        @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+        @keyframes growSprout { to { opacity: 1; transform: scale(1); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
 
-        /* --- ЭКРАН 2: ГЛАВНЫЙ --- */
-        .header { text-align: center; margin-top: 40px; }
-        .header h1 { font-size: 32px; font-weight: 800; margin: 0; color: #0f172a; }
+        /* --- ГЛАВНЫЙ ЭКРАН --- */
+        .header { text-align: center; margin-top: 50px; z-index: 2; }
+        .header h1 { font-size: 34px; font-weight: 900; margin: 0; color: #0f172a; text-shadow: 0 2px 4px rgba(255,255,255,0.5); }
         
         .tree-scene {
-            position: relative;
-            width: 250px; height: 300px;
+            position: relative; width: 280px; height: 320px;
             display: flex; justify-content: center; align-items: flex-end;
-            margin-top: 20px;
+            margin-top: 20px; z-index: 2;
         }
-        .tree-svg {
-            width: 100%; height: 100%;
-            transition: all 0.8s ease;
-            transform-origin: bottom center;
-        }
-        .alive .tree-svg { animation: sway 4s ease-in-out infinite alternate; }
-        @keyframes sway { 0% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
-
-        .trunk { fill: #854d0e; transition: fill 0.5s; }
-        .leaf { fill: #22c55e; transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
         
-        .withered .trunk { fill: #57534e; }
+        /* Улучшенное SVG дерево */
+        .tree-svg { width: 100%; height: 100%; transition: all 0.8s ease; transform-origin: bottom center; }
+        .alive .tree-svg { animation: sway 4s ease-in-out infinite alternate; }
+        @keyframes sway { 0% { transform: rotate(-3deg); } 100% { transform: rotate(3deg); } }
+
+        .trunk { fill: url(#trunkGradient); transition: fill 0.5s; }
+        .leaf { fill: url(#leafGradient); transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
+        
+        .withered .trunk { fill: #78716c; }
         .withered .leaf { fill: #a8a29e; transform: translateY(150px) rotate(90deg) scale(0.5); opacity: 0; }
 
-        /* Кнопки (общий стиль Дуолинго) */
+        /* Кнопки в стиле Duolingo */
         .action-btn {
-            width: 90%; max-width: 350px; padding: 18px;
-            font-size: 18px; font-family: 'Nunito', sans-serif; font-weight: 800;
-            color: white; background-color: #22c55e;
+            width: 85%; max-width: 350px; padding: 20px;
+            font-size: 20px; font-family: 'Nunito', sans-serif; font-weight: 900;
+            color: white; background-color: #58cc02;
             border: none; border-radius: 16px;
-            box-shadow: 0 6px 0 #166534;
+            box-shadow: 0 8px 0 #46a302; /* Глубокий 3D-эффект */
             cursor: pointer; transition: all 0.1s ease;
             text-transform: uppercase; letter-spacing: 1px;
+            z-index: 2;
         }
-        .action-btn:active { transform: translateY(6px); box-shadow: 0 0px 0 #166534; }
-        .btn-container { width: 100%; padding: 20px; display: flex; justify-content: center; margin-bottom: 30px; }
+        .action-btn:active { transform: translateY(8px); box-shadow: 0 0px 0 #46a302; }
+        
+        .btn-container { width: 100%; padding: 20px; display: flex; justify-content: center; margin-bottom: 40px; z-index: 2;}
+        
     </style>
 </head>
 <body>
 
+    <div class="clouds"></div>
+
     <!-- ЭКРАН 1: ОНБОРДИНГ -->
     <div id="onboarding-screen" class="screen">
-        <div class="pot">
-            <div class="seed"></div>
-            <div class="sprout"></div>
+        <div class="pot-container">
+            🪴
+            <!-- Убираем кастомный росток, эмодзи горшка уже с росточком для красоты -->
         </div>
-        <div class="onboarding-text">День 1</div>
+        
+        <div class="onboarding-text">
+            День 1 <span class="fire-icon">🔥</span>
+        </div>
+        
         <div class="onboarding-btn">
             <button class="action-btn" id="start-btn">Изучать английский</button>
         </div>
     </div>
 
-    <!-- ЭКРАН 2: ГЛАВНЫЙ ЭКРАН С ДЕРЕВОМ -->
+    <!-- ЭКРАН 2: ГЛАВНЫЙ ЭКРАН -->
     <div id="main-screen" class="screen hidden">
         <div class="header">
             <h1>Grownilgo 🌳</h1>
@@ -189,16 +152,32 @@
 
         <div class="tree-scene alive" id="treeContainer">
             <svg class="tree-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+                <!-- Градиенты для объема -->
+                <defs>
+                    <linearGradient id="trunkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#78350f" />
+                        <stop offset="50%" stop-color="#b45309" />
+                        <stop offset="100%" stop-color="#78350f" />
+                    </linearGradient>
+                    <radialGradient id="leafGradient" cx="30%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#86efac" />
+                        <stop offset="100%" stop-color="#16a34a" />
+                    </radialGradient>
+                </defs>
+
+                <!-- Ствол -->
                 <path class="trunk" d="M90,250 L110,250 L105,130 L95,130 Z" />
                 <path class="trunk" d="M100,160 L60,130 L55,140 L100,170 Z" />
                 <path class="trunk" d="M100,180 L140,140 L145,150 L100,190 Z" />
+                
+                <!-- Листья -->
                 <circle class="leaf" cx="100" cy="100" r="45" />
                 <circle class="leaf" cx="60" cy="120" r="35" />
                 <circle class="leaf" cx="140" cy="120" r="35" />
                 <circle class="leaf" cx="80" cy="70" r="30" />
                 <circle class="leaf" cx="120" cy="70" r="30" />
-                <circle class="leaf" cx="85" cy="85" r="15" opacity="0.4" fill="#a3e635" />
-                <circle class="leaf" cx="130" cy="105" r="10" opacity="0.4" fill="#a3e635" />
+                <circle class="leaf" cx="85" cy="85" r="15" opacity="0.6" fill="#bbf7d0" />
+                <circle class="leaf" cx="130" cy="105" r="10" opacity="0.6" fill="#bbf7d0" />
             </svg>
         </div>
 
@@ -208,38 +187,21 @@
     </div>
 
     <script>
-        // 1. Инициализация Telegram
         const tg = window.Telegram?.WebApp;
         if (tg) { tg.ready(); tg.expand(); }
 
-        // 2. Генерация конфетти при загрузке
-        function createConfetti() {
-            const colors = ['#fbbf24', '#f87171', '#60a5fa', '#34d399', '#a78bfa'];
-            for (let i = 0; i < 40; i++) {
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti');
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDelay = Math.random() * 2 + 's';
-                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                document.getElementById('onboarding-screen').appendChild(confetti);
-            }
-        }
-        createConfetti();
-
-        // 3. Логика переключения экранов
         const onboardingScreen = document.getElementById('onboarding-screen');
         const mainScreen = document.getElementById('main-screen');
         
+        // Переход на главный экран
         document.getElementById('start-btn').addEventListener('click', () => {
-            // Прячем онбординг, показываем главный экран
             onboardingScreen.classList.add('hidden');
             setTimeout(() => {
                 mainScreen.classList.remove('hidden');
-            }, 500); // Ждем, пока исчезнет первый экран
+            }, 400);
         });
 
-        // 4. Логика увядания дерева на главном экране
+        // Логика увядания
         const treeContainer = document.getElementById('treeContainer');
         const actionBtn = document.getElementById('actionBtn');
 
@@ -249,13 +211,13 @@
                 treeContainer.classList.add('withered');
                 actionBtn.textContent = 'Оживить дерево';
                 actionBtn.style.backgroundColor = '#3b82f6';
-                actionBtn.style.boxShadow = '0 6px 0 #1e3a8a';
+                actionBtn.style.boxShadow = '0 8px 0 #1e3a8a';
             } else {
                 treeContainer.classList.remove('withered');
                 treeContainer.classList.add('alive');
                 actionBtn.textContent = 'Проверить, как сохнет';
-                actionBtn.style.backgroundColor = '#22c55e';
-                actionBtn.style.boxShadow = '0 6px 0 #166534';
+                actionBtn.style.backgroundColor = '#58cc02';
+                actionBtn.style.boxShadow = '0 8px 0 #46a302';
             }
         });
     </script>
