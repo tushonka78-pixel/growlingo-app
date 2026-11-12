@@ -7,261 +7,1048 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root{ --key: transparent; }
-
   *{ box-sizing: border-box; }
-  html, body{
-    margin: 0; height: 100%;
-    background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
-    display: grid; place-items: center;
-    font-family: sans-serif;
-    overflow: hidden;
-  }
-
-  /* ============ ОБЁРТКА ОНБОРДИНГА ============ */
-  #intro-wrapper{
-    position: absolute; inset: 0;
-    display: flex; justify-content: center; align-items: center;
-    transition: opacity .55s ease, transform .55s ease;
-    z-index: 10;
-  }
-  #intro-wrapper.hidden{
-    opacity: 0; pointer-events: none; transform: scale(.94);
-  }
-
-  /* ==================== АНИМАЦИЯ ==================== */
-  .stage{
-    position: relative;
-    width: 420px; height: 620px;
-    background: var(--key); overflow: hidden;
-  }
+  html, body{ margin: 0; height: 100%; background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%); display: grid; place-items: center; font-family: sans-serif; overflow: hidden; }
+  #intro-wrapper{ position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; transition: opacity .55s ease, transform .55s ease; z-index: 10; }
+  #intro-wrapper.hidden{ opacity: 0; pointer-events: none; transform: scale(.94); }
+  .stage{ position: relative; width: 420px; height: 620px; background: var(--key); overflow: hidden; }
   .scene{ position: absolute; left: 0; right: 0; top: 0; bottom: 60px; }
-
-  .shadow{
-    position: absolute; left: 50%; bottom: 70px;
-    width: 180px; height: 28px; margin-left: -90px;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,.42) 0%, rgba(0,0,0,.20) 45%, rgba(0,0,0,0) 72%);
-    transform-origin: center; animation: shadowIn 5s 1 forwards;
-  }
-  @keyframes shadowIn{
-    0%, 10%   { opacity: 0; transform: scale(.35); }
-    12%       { opacity: 1; transform: scale(1.06); }
-    15%, 100% { opacity: 1; transform: scale(1); }
-  }
-
-  .pot-wrap{
-    position: absolute; left: 50%; bottom: 80px;
-    width: 140px; height: 110px; margin-left: -70px;
-    transform-origin: 50% 100%; animation: potDrop 5s 1 forwards;
-  }
-  @keyframes potDrop{
-    0%    { transform: translateY(-720px) rotate(-16deg); animation-timing-function: cubic-bezier(.5,0,.9,.5); }
-    11%   { transform: translateY(0) rotate(0deg); animation-timing-function: ease-out; }
-    13.5% { transform: translateY(5px) scale(1.12,.86); animation-timing-function: ease-out; }
-    16%   { transform: translateY(-9px) scale(.95,1.06); animation-timing-function: ease-in; }
-    18.5% { transform: translateY(2px) scale(1.02,.98); animation-timing-function: ease-out; }
-    21%, 100% { transform: translateY(0) scale(1,1); }
-  }
-
-  .pot-body{
-    position: absolute; inset: 0;
-    background: linear-gradient(100deg, #5d2c07 0%, #8c4a12 12%, #c47a30 30%, #e2a35e 40%, #cf8b3d 50%, #b06a24 64%, #8a4611 82%, #522605 100%);
-    clip-path: polygon(0% 0%, 100% 0%, 87% 100%, 13% 100%);
-  }
-  .pot-body::before{
-    content: ""; position: absolute; inset: 0;
-    background-image: repeating-linear-gradient(90deg, rgba(55,22,0,.11) 0 1.5px, rgba(255,225,185,.07) 1.5px 3px, transparent 3px 12px), radial-gradient(circle at 24% 34%, rgba(50,20,0,.18) 0 2px, transparent 2.6px), radial-gradient(circle at 62% 58%, rgba(50,20,0,.14) 0 1.7px, transparent 2.2px), radial-gradient(circle at 79% 76%, rgba(255,225,190,.16) 0 1.5px, transparent 2px), radial-gradient(circle at 39% 82%, rgba(50,20,0,.13) 0 1.9px, transparent 2.4px), radial-gradient(circle at 55% 22%, rgba(255,225,190,.12) 0 1.4px, transparent 1.9px);
-  }
-  .pot-body::after{
-    content: ""; position: absolute; top: 0; left: 25%; width: 11%; height: 100%;
-    background: linear-gradient(to bottom, rgba(255,255,255,.42), rgba(255,255,255,.10) 60%, rgba(255,255,255,.02));
-    filter: blur(.4px);
-  }
-  .pot-rim{
-    position: absolute; top: -16px; left: -6px; width: 152px; height: 34px; border-radius: 50%;
-    background: linear-gradient(to bottom, #f7b671 0%, #e09a4d 30%, #c07a2c 55%, #9a5915 78%, #6d3a08 100%);
-    box-shadow: inset 0 -6px 9px rgba(0,0,0,.38), 0 3px 6px rgba(0,0,0,.28);
-  }
-  .rim-inner{
-    position: absolute; top: -10px; left: 2px; width: 136px; height: 24px; border-radius: 50%;
-    background: radial-gradient(ellipse at 50% 20%, #4a2408 0%, #351806 55%, #241004 100%);
-    box-shadow: inset 0 3px 6px rgba(0,0,0,.85);
-  }
-  .rim-shine{
-    position: absolute; top: 3px; left: 18px; width: 54px; height: 11px; border-radius: 50%;
-    background: radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.62), rgba(255,255,255,0) 70%);
-  }
-  .pot-soil{
-    position: absolute; top: -8px; left: 7px; width: 126px; height: 20px; border-radius: 50%;
-    background: radial-gradient(ellipse at 50% 32%, #7a5227 0%, #4e2f12 52%, #2b1807 100%);
-    box-shadow: inset 0 3px 8px rgba(0,0,0,.75);
-  }
-  .pot-soil::after{
-    content: ""; position: absolute; inset: 0; border-radius: 50%;
-    background: radial-gradient(circle at 30% 46%, rgba(255,220,170,.16) 0 1.4px, transparent 1.9px), radial-gradient(circle at 55% 30%, rgba(0,0,0,.30) 0 1.8px, transparent 2.3px), radial-gradient(circle at 73% 62%, rgba(255,220,170,.12) 0 1.2px, transparent 1.7px), radial-gradient(circle at 42% 70%, rgba(0,0,0,.26) 0 1.6px, transparent 2.1px), radial-gradient(circle at 62% 52%, rgba(255,220,170,.10) 0 1.1px, transparent 1.5px);
-  }
-
+  .shadow{ position: absolute; left: 50%; bottom: 70px; width: 180px; height: 28px; margin-left: -90px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(0,0,0,.42) 0%, rgba(0,0,0,.20) 45%, rgba(0,0,0,0) 72%); transform-origin: center; animation: shadowIn 5s 1 forwards; }
+  @keyframes shadowIn{ 0%, 10%{opacity:0;transform:scale(.35)} 12%{opacity:1;transform:scale(1.06)} 15%,100%{opacity:1;transform:scale(1)} }
+  .pot-wrap{ position: absolute; left: 50%; bottom: 80px; width: 140px; height: 110px; margin-left: -70px; transform-origin: 50% 100%; animation: potDrop 5s 1 forwards; }
+  @keyframes potDrop{ 0%{transform:translateY(-720px) rotate(-16deg);animation-timing-function:cubic-bezier(.5,0,.9,.5)} 11%{transform:translateY(0) rotate(0);animation-timing-function:ease-out} 13.5%{transform:translateY(5px) scale(1.12,.86);animation-timing-function:ease-out} 16%{transform:translateY(-9px) scale(.95,1.06);animation-timing-function:ease-in} 18.5%{transform:translateY(2px) scale(1.02,.98);animation-timing-function:ease-out} 21%,100%{transform:translateY(0) scale(1)} }
+  .pot-body{ position: absolute; inset: 0; background: linear-gradient(100deg, #5d2c07 0%, #8c4a12 12%, #c47a30 30%, #e2a35e 40%, #cf8b3d 50%, #b06a24 64%, #8a4611 82%, #522605 100%); clip-path: polygon(0% 0%, 100% 0%, 87% 100%, 13% 100%); }
+  .pot-body::before{ content:""; position:absolute; inset:0; background-image: repeating-linear-gradient(90deg, rgba(55,22,0,.11) 0 1.5px, rgba(255,225,185,.07) 1.5px 3px, transparent 3px 12px), radial-gradient(circle at 24% 34%, rgba(50,20,0,.18) 0 2px, transparent 2.6px), radial-gradient(circle at 62% 58%, rgba(50,20,0,.14) 0 1.7px, transparent 2.2px), radial-gradient(circle at 79% 76%, rgba(255,225,190,.16) 0 1.5px, transparent 2px), radial-gradient(circle at 39% 82%, rgba(50,20,0,.13) 0 1.9px, transparent 2.4px), radial-gradient(circle at 55% 22%, rgba(255,225,190,.12) 0 1.4px, transparent 1.9px); }
+  .pot-body::after{ content:""; position:absolute; top:0; left:25%; width:11%; height:100%; background: linear-gradient(to bottom, rgba(255,255,255,.42), rgba(255,255,255,.10) 60%, rgba(255,255,255,.02)); filter: blur(.4px); }
+  .pot-rim{ position: absolute; top: -16px; left: -6px; width: 152px; height: 34px; border-radius: 50%; background: linear-gradient(to bottom, #f7b671 0%, #e09a4d 30%, #c07a2c 55%, #9a5915 78%, #6d3a08 100%); box-shadow: inset 0 -6px 9px rgba(0,0,0,.38), 0 3px 6px rgba(0,0,0,.28); }
+  .rim-inner{ position: absolute; top: -10px; left: 2px; width: 136px; height: 24px; border-radius: 50%; background: radial-gradient(ellipse at 50% 20%, #4a2408 0%, #351806 55%, #241004 100%); box-shadow: inset 0 3px 6px rgba(0,0,0,.85); }
+  .rim-shine{ position: absolute; top: 3px; left: 18px; width: 54px; height: 11px; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.62), rgba(255,255,255,0) 70%); }
+  .pot-soil{ position: absolute; top: -8px; left: 7px; width: 126px; height: 20px; border-radius: 50%; background: radial-gradient(ellipse at 50% 32%, #7a5227 0%, #4e2f12 52%, #2b1807 100%); box-shadow: inset 0 3px 8px rgba(0,0,0,.75); }
+  .pot-soil::after{ content:""; position:absolute; inset:0; border-radius:50%; background: radial-gradient(circle at 30% 46%, rgba(255,220,170,.16) 0 1.4px, transparent 1.9px), radial-gradient(circle at 55% 30%, rgba(0,0,0,.30) 0 1.8px, transparent 2.3px), radial-gradient(circle at 73% 62%, rgba(255,220,170,.12) 0 1.2px, transparent 1.7px), radial-gradient(circle at 42% 70%, rgba(0,0,0,.26) 0 1.6px, transparent 2.1px), radial-gradient(circle at 62% 52%, rgba(255,220,170,.10) 0 1.1px, transparent 1.5px); }
   .dust i{ position: absolute; left: 50%; bottom: 84px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: #8a5a26; opacity: 0; animation: puff 5s 1 forwards; }
-  .dust i:nth-child(1){ --dx:-80px; --dy:-36px; width: 9px; height: 9px; }
-  .dust i:nth-child(2){ --dx: 74px; --dy:-30px; }
-  .dust i:nth-child(3){ --dx:-54px; --dy:-56px; width: 6px; height: 6px; }
-  .dust i:nth-child(4){ --dx: 48px; --dy:-58px; width: 8px; height: 8px; }
-  .dust i:nth-child(5){ --dx:-100px; --dy:-14px; width: 5px; height: 5px; }
-  .dust i:nth-child(6){ --dx: 92px; --dy:-16px; width: 6px; height: 6px; }
-  @keyframes puff{
-    0%, 11.4% { opacity: 0; transform: translate(0,0) scale(.4); }
-    12.4%     { opacity: .95; transform: translate(calc(var(--dx)*.12), calc(var(--dy)*.12)) scale(1); }
-    22%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.22); }
-  }
-
-  .seed{
-    position: absolute; left: 50%; bottom: 186px; width: 18px; height: 13px; margin-left: -9px; z-index: 20;
-    border-radius: 60% 40% 45% 55% / 70% 65% 35% 30%;
-    background: linear-gradient(150deg, #f2cb8d 0%, #cb9c50 38%, #8d611f 72%, #5b390b 100%);
-    box-shadow: inset -2px -2px 3px rgba(0,0,0,.42), inset 2px 2px 3px rgba(255,255,255,.55), 0 1px 2px rgba(0,0,0,.3);
-    opacity: 0; animation: seedFall 5s 1 forwards;
-  }
-  .seed::after{ content: ""; position: absolute; left: 4px; top: 3px; width: 5px; height: 2.5px; border-radius: 50%; background: rgba(255,255,255,.75); transform: rotate(-20deg); }
-  @keyframes seedFall{
-    0%, 20%   { opacity: 0; transform: translateY(-430px) rotate(0deg); }
-    21%       { opacity: 1; transform: translateY(-430px) rotate(0deg); animation-timing-function: cubic-bezier(.45,0,.85,.6); }
-    31%       { opacity: 1; transform: translateY(0) rotate(220deg); animation-timing-function: ease-out; }
-    34%       { opacity: 1; transform: translateY(-14px) rotate(252deg); animation-timing-function: ease-in; }
-    38%       { opacity: 1; transform: translateY(2px) rotate(282deg); }
-    42%, 100% { opacity: 0; transform: translateY(12px) rotate(315deg) scale(.9); }
-  }
-
+  .dust i:nth-child(1){ --dx:-80px; --dy:-36px; width:9px; height:9px; } .dust i:nth-child(2){ --dx:74px; --dy:-30px; } .dust i:nth-child(3){ --dx:-54px; --dy:-56px; width:6px; height:6px; } .dust i:nth-child(4){ --dx:48px; --dy:-58px; width:8px; height:8px; } .dust i:nth-child(5){ --dx:-100px; --dy:-14px; width:5px; height:5px; } .dust i:nth-child(6){ --dx:92px; --dy:-16px; width:6px; height:6px; }
+  @keyframes puff{ 0%,11.4%{opacity:0;transform:translate(0,0) scale(.4)} 12.4%{opacity:.95;transform:translate(calc(var(--dx)*.12), calc(var(--dy)*.12)) scale(1)} 22%,100%{opacity:0;transform:translate(var(--dx), var(--dy)) scale(.22)} }
+  .seed{ position: absolute; left: 50%; bottom: 186px; width: 18px; height: 13px; margin-left: -9px; z-index: 20; border-radius: 60% 40% 45% 55% / 70% 65% 35% 30%; background: linear-gradient(150deg, #f2cb8d 0%, #cb9c50 38%, #8d611f 72%, #5b390b 100%); box-shadow: inset -2px -2px 3px rgba(0,0,0,.42), inset 2px 2px 3px rgba(255,255,255,.55), 0 1px 2px rgba(0,0,0,.3); opacity: 0; animation: seedFall 5s 1 forwards; }
+  .seed::after{ content:""; position:absolute; left:4px; top:3px; width:5px; height:2.5px; border-radius:50%; background: rgba(255,255,255,.75); transform: rotate(-20deg); }
+  @keyframes seedFall{ 0%,20%{opacity:0;transform:translateY(-430px) rotate(0)} 21%{opacity:1;transform:translateY(-430px) rotate(0);animation-timing-function:cubic-bezier(.45,0,.85,.6)} 31%{opacity:1;transform:translateY(0) rotate(220deg);animation-timing-function:ease-out} 34%{opacity:1;transform:translateY(-14px) rotate(252deg);animation-timing-function:ease-in} 38%{opacity:1;transform:translateY(2px) rotate(282deg)} 42%,100%{opacity:0;transform:translateY(12px) rotate(315deg) scale(.9)} }
   .sprout-svg{ position: absolute; left: 50%; bottom: 184px; width: 140px; height: 200px; margin-left: -70px; overflow: visible; z-index: 30; }
   .sprout-sway{ transform-box: view-box; transform-origin: 70px 196px; animation: swayGrow 5s 1 forwards; }
-  @keyframes swayGrow{ 0%, 76% { transform: rotate(0deg); } 84% { transform: rotate(-2.3deg); } 91% { transform: rotate(1.7deg); } 96% { transform: rotate(-.7deg); } 100% { transform: rotate(0deg); } }
+  @keyframes swayGrow{ 0%,76%{transform:rotate(0)} 84%{transform:rotate(-2.3deg)} 91%{transform:rotate(1.7deg)} 96%{transform:rotate(-.7deg)} 100%{transform:rotate(0)} }
   .sprout-idle{ transform-box: view-box; transform-origin: 70px 196px; animation: swayIdle 2.8s ease-in-out 5s infinite; }
-  @keyframes swayIdle{ 0% { transform: rotate(-1.7deg); } 50% { transform: rotate(1.7deg); } 100% { transform: rotate(-1.7deg); } }
-  .stem-path, .stem-hi{ stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawStem 5s 1 forwards; }
-  @keyframes drawStem{ 0%, 44% { stroke-dashoffset: 100; } 66%, 100% { stroke-dashoffset: 0; } }
-  .stem-node{ opacity: 0; animation: nodeIn 5s 1 forwards; }
-  @keyframes nodeIn{ 0%, 56% { opacity: 0; } 64%, 100% { opacity: .85; } }
+  @keyframes swayIdle{ 0%{transform:rotate(-1.7deg)} 50%{transform:rotate(1.7deg)} 100%{transform:rotate(-1.7deg)} }
+  .stem-path,.stem-hi{ stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawStem 5s 1 forwards; }
+  @keyframes drawStem{ 0%,44%{stroke-dashoffset:100} 66%,100%{stroke-dashoffset:0} }
+  .stem-node{ opacity:0; animation: nodeIn 5s 1 forwards; }
+  @keyframes nodeIn{ 0%,56%{opacity:0} 64%,100%{opacity:.85} }
   .leaf-left{ transform-box: fill-box; transform-origin: 100% 100%; animation: leafL 5s 1 forwards; }
-  @keyframes leafL{ 0%, 57% { opacity: 0; transform: scale(.04) rotate(-12deg); } 64% { opacity: 1; transform: scale(1.14) rotate(2deg); } 68%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+  @keyframes leafL{ 0%,57%{opacity:0;transform:scale(.04) rotate(-12deg)} 64%{opacity:1;transform:scale(1.14) rotate(2deg)} 68%,100%{opacity:1;transform:scale(1) rotate(0)} }
   .leaf-right{ transform-box: fill-box; transform-origin: 0% 100%; animation: leafR 5s 1 forwards; }
-  @keyframes leafR{ 0%, 61% { opacity: 0; transform: scale(.04) rotate(12deg); } 68% { opacity: 1; transform: scale(1.14) rotate(-2deg); } 72%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+  @keyframes leafR{ 0%,61%{opacity:0;transform:scale(.04) rotate(12deg)} 68%{opacity:1;transform:scale(1.14) rotate(-2deg)} 72%,100%{opacity:1;transform:scale(1) rotate(0)} }
   .leaf-bud{ transform-box: fill-box; transform-origin: 50% 100%; animation: leafB 5s 1 forwards; }
-  @keyframes leafB{ 0%, 67% { opacity: 0; transform: scale(.04) rotate(8deg); } 74% { opacity: 1; transform: scale(1.16) rotate(-2deg); } 78%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
-
+  @keyframes leafB{ 0%,67%{opacity:0;transform:scale(.04) rotate(8deg)} 74%{opacity:1;transform:scale(1.16) rotate(-2deg)} 78%,100%{opacity:1;transform:scale(1) rotate(0)} }
   .caption{ position: absolute; left: 0; right: 0; bottom: 16px; text-align: center; opacity: 0; animation: capIn .9s cubic-bezier(.22,.9,.3,1) 5.2s 1 forwards; }
-  @keyframes capIn{ from{ opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  .day{ font: 800 46px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #fff; letter-spacing: .5px; text-shadow: 0 3px 12px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.45); }
-  .cta{ display: inline-block; margin-top: 12px; padding: 11px 26px; border: 0; border-radius: 999px; font: 600 16px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #f2fff2; background: linear-gradient(180deg, #2c9a2c, #145214); box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.25); cursor: pointer; transition: transform .18s ease, box-shadow .18s ease; }
-  .cta:hover { transform: translateY(-2px); box-shadow: 0 9px 18px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.3); }
-  .cta:active { transform: translateY(0); }
-
-  /* ============================================================
-     ГЛАВНЫЙ ЭКРАН
-     ============================================================ */
+  @keyframes capIn{ from{opacity:0;transform:translateY(16px) scale(.96)} to{opacity:1;transform:translateY(0) scale(1)} }
+  .day{ font: 800 46px/1 "Segoe UI","Helvetica Neue",Arial,sans-serif; color: #fff; letter-spacing: .5px; text-shadow: 0 3px 12px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.45); }
+  .cta{ display: inline-block; margin-top: 12px; padding: 11px 26px; border: 0; border-radius: 999px; font: 600 16px/1 "Segoe UI","Helvetica Neue",Arial,sans-serif; color: #f2fff2; background: linear-gradient(180deg, #2c9a2c, #145214); box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.25); cursor: pointer; transition: transform .18s ease, box-shadow .18s ease; }
+  .cta:hover{ transform: translateY(-2px); box-shadow: 0 9px 18px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.3); }
+  .cta:active{ transform: translateY(0); }
   #main-screen{ position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, #f5faff 0%, #dbeafe 100%); opacity: 0; pointer-events: none; transition: opacity .55s ease; z-index: 5; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   #main-screen.active{ opacity: 1; pointer-events: auto; }
-  #main-screen::before, #main-screen::after{ content: ""; position: absolute; pointer-events: none; border-radius: 50%; filter: blur(50px); }
-  #main-screen::before{ top: 80px; right: -60px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(147,197,253,.45), transparent 70%); }
-  #main-screen::after{ bottom: 140px; left: -80px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(96,165,250,.28), transparent 70%); }
-
+  #main-screen::before, #main-screen::after{ content:""; position:absolute; pointer-events:none; border-radius:50%; filter: blur(50px); }
+  #main-screen::before{ top:80px; right:-60px; width:220px; height:220px; background: radial-gradient(circle, rgba(147,197,253,.45), transparent 70%); }
+  #main-screen::after{ bottom:140px; left:-80px; width:200px; height:200px; background: radial-gradient(circle, rgba(96,165,250,.28), transparent 70%); }
   .app-shell{ width: 100%; max-width: 480px; height: 100%; display: flex; flex-direction: column; position: relative; z-index: 1; }
-
-  /* ---- ВЕРХНЯЯ ПАНЕЛЬ ---- */
   .top-bar{ display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top, 12px)); gap: 10px; flex-shrink: 0; }
   .stats{ display: flex; gap: 6px; flex: 1; min-width: 0; }
-  .stat{ display: flex; align-items: center; gap: 5px; background: #ffffff; height: 52px; padding: 0 12px 0 8px; border-radius: 16px; box-shadow: 0 2px 8px rgba(30,64,175,.08), 0 1px 2px rgba(0,0,0,.03); flex-shrink: 0; }
+  .stat{ display: flex; align-items: center; gap: 5px; background: #fff; height: 52px; padding: 0 12px 0 8px; border-radius: 16px; box-shadow: 0 2px 8px rgba(30,64,175,.08), 0 1px 2px rgba(0,0,0,.03); flex-shrink: 0; }
   .stat-anim{ display: block; flex-shrink: 0; }
-  .stat-fire .stat-anim{ width: 28px; height: 36px; }
-  .stat-gem .stat-anim{ width: 26px; height: 30px; }
-  .stat-life .stat-anim{ width: 39px; height: 26px; }
+  .stat-fire .stat-anim{ width: 28px; height: 36px; } .stat-gem .stat-anim{ width: 26px; height: 30px; } .stat-life .stat-anim{ width: 39px; height: 26px; }
   .stat-num{ font-weight: 800; font-size: 14px; color: #1e40af; line-height: 1; }
-  .avatar-btn{ width: 42px; height: 42px; border-radius: 50%; border: 3px solid #ffffff; background: linear-gradient(135deg, #93c5fd, #3b82f6); color: #fff; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 3px 10px rgba(59,130,246,.35); display: grid; place-items: center; transition: transform .15s ease; flex-shrink: 0; }
+  .avatar-btn{ width: 42px; height: 42px; border-radius: 50%; border: 3px solid #fff; background: linear-gradient(135deg, #93c5fd, #3b82f6); color: #fff; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 3px 10px rgba(59,130,246,.35); display: grid; place-items: center; transition: transform .15s ease; flex-shrink: 0; }
   .avatar-btn:active{ transform: scale(.92); }
-
-  /* КОНТЕНТ */
   .content{ flex: 1; overflow-y: auto; padding: 4px 18px 110px; -webkit-overflow-scrolling: touch; }
   .content::-webkit-scrollbar{ width: 0; }
-  .daily-card{ background: #ffffff; border-radius: 18px; padding: 16px 18px; box-shadow: 0 4px 16px rgba(30,64,175,.07), 0 1px 3px rgba(0,0,0,.03); margin-bottom: 22px; }
+  .daily-card{ background: #fff; border-radius: 18px; padding: 16px 18px; box-shadow: 0 4px 16px rgba(30,64,175,.07), 0 1px 3px rgba(0,0,0,.03); margin-bottom: 22px; }
   .daily-top{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
   .daily-title{ font-size: 15px; font-weight: 800; color: #1e293b; }
   .daily-sub{ font-size: 12px; color: #64748b; margin-top: 3px; font-weight: 500; }
   .daily-count{ font-size: 13px; color: #64748b; font-weight: 600; white-space: nowrap; }
   .daily-count strong{ color: #1e40af; font-size: 15px; }
   .daily-bar{ height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; position: relative; }
-  .daily-fill{ height: 100%; width: 0%; background: linear-gradient(90deg, #60a5fa, #3b82f6); border-radius: 999px; position: relative; transition: width 0.5s ease; }
-  .daily-fill::after{ content: ""; position: absolute; top: 2px; left: 10px; right: 10px; height: 2.5px; background: rgba(255,255,255,.45); border-radius: 999px; }
-
+  .daily-fill{ height: 100%; width: 0%; background: linear-gradient(90deg, #60a5fa, #3b82f6); border-radius: 999px; position: relative; transition: width .4s ease; }
+  .daily-fill::after{ content:""; position:absolute; top:2px; left:10px; right:10px; height:2.5px; background: rgba(255,255,255,.45); border-radius: 999px; }
   .section-header{ margin: 0 4px 12px; }
   .section-label{ display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 1.4px; color: #2563eb; text-transform: uppercase; background: rgba(59,130,246,.1); padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; }
   .section-title{ font-size: 22px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: -0.3px; }
-
-  /* УРОКИ (ПУТЬ) */
-  .path{ display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 22px 0 30px; }
-  .node{ width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; font-weight: 900; color: #fff; position: relative; cursor: pointer; transition: transform .15s ease; user-select: none; flex-shrink: 0; }
-  
-  /* Змейка: смещение четных и нечетных узлов */
-  .node:nth-child(odd){ margin-right: 80px; }
-  .node:nth-child(even){ margin-left: 80px; }
-
-  .node:active{ transform: scale(.9); }
-  
-  .node.current{ background: linear-gradient(180deg, #93c5fd, #60a5fa); box-shadow: 0 6px 0 #1e40af, 0 0 0 10px rgba(96,165,250,.22), 0 8px 22px rgba(30,64,175,.3); animation: nodePulse 2.4s ease-in-out infinite; }
-  @keyframes nodePulse{
-    0%, 100% { box-shadow: 0 6px 0 #1e40af, 0 0 0 10px rgba(96,165,250,.22), 0 8px 22px rgba(30,64,175,.3); }
-    50%      { box-shadow: 0 6px 0 #1e40af, 0 0 0 18px rgba(96,165,250,.08), 0 8px 22px rgba(30,64,175,.3); }
-  }
-  .node.current::before{ content: ""; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 12px solid #1e40af; animation: bounceDown 1.6s ease-in-out infinite; filter: drop-shadow(0 2px 3px rgba(30,64,175,.25)); }
-  @keyframes bounceDown{ 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
-  
-  .node.locked{ background: #e2e8f0; color: #94a3b8; box-shadow: 0 6px 0 #cbd5e1; font-size: 24px; opacity: 0.7; }
-  .node.completed{ background: linear-gradient(180deg, #60a5fa, #3b82f6); box-shadow: 0 6px 0 #1e40af; }
-  
-  /* Метка под первым уроком */
-  .node-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
-  .node-wrapper:nth-child(odd){ margin-right: 80px; }
-  .node-wrapper:nth-child(even){ margin-left: 80px; }
-  .node-wrapper .node { margin: 0; }
-  
-  .node-label { font-size: 13px; font-weight: 800; color: #1e40af; margin-top: 10px; text-align: center; background: white; padding: 4px 10px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); white-space: nowrap; }
-
+  .level-badge{ display: inline-block; margin-left: 8px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; font-size: 12px; font-weight: 900; padding: 3px 9px; border-radius: 8px; vertical-align: middle; box-shadow: 0 2px 6px rgba(245,158,11,.35); }
+  .path{ display: flex; flex-direction: column; align-items: center; gap: 26px; padding: 26px 0 30px; }
+  .node{ width: 74px; height: 74px; border-radius: 50%; display: grid; place-items: center; color: #fff; position: relative; cursor: pointer; user-select: none; flex-shrink: 0; transition: transform .15s ease; font-size: 0; }
+  .node:nth-child(odd){ margin-right: 80px; } .node:nth-child(even){ margin-left: 80px; }
+  .node:active{ transform: scale(.92); }
+  .node svg{ width: 34px; height: 34px; display: block; }
+  .node.completed{ background: linear-gradient(160deg, #34d399 0%, #059669 100%); box-shadow: 0 6px 0 #065f46, 0 10px 20px rgba(5,150,105,.32), inset 0 2px 4px rgba(255,255,255,.4), inset 0 -3px 8px rgba(0,0,0,.14); }
+  .node.completed::after{ content:""; position:absolute; top:8px; left:18%; right:18%; height:40%; border-radius:50%; background: linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0)); pointer-events: none; }
+  .node.current{ background: linear-gradient(160deg, #60a5fa 0%, #2563eb 100%); box-shadow: 0 6px 0 #1e3a8a, 0 0 0 6px rgba(96,165,250,.28), 0 10px 24px rgba(37,99,235,.4), inset 0 2px 4px rgba(255,255,255,.42), inset 0 -3px 8px rgba(0,0,0,.14); animation: nodePulse 2.4s ease-in-out infinite; }
+  .node.current::after{ content:""; position:absolute; top:8px; left:18%; right:18%; height:40%; border-radius:50%; background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0)); pointer-events: none; }
+  @keyframes nodePulse{ 0%,100%{ box-shadow: 0 6px 0 #1e3a8a, 0 0 0 6px rgba(96,165,250,.28), 0 10px 24px rgba(37,99,235,.4), inset 0 2px 4px rgba(255,255,255,.42), inset 0 -3px 8px rgba(0,0,0,.14); } 50%{ box-shadow: 0 6px 0 #1e3a8a, 0 0 0 15px rgba(96,165,250,.10), 0 10px 24px rgba(37,99,235,.4), inset 0 2px 4px rgba(255,255,255,.42), inset 0 -3px 8px rgba(0,0,0,.14); } }
+  .node.current::before{ content:""; position:absolute; top:-20px; left:50%; transform: translateX(-50%); width:0; height:0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 12px solid #1e40af; animation: bounceDown 1.6s ease-in-out infinite; filter: drop-shadow(0 2px 3px rgba(30,64,175,.3)); }
+  @keyframes bounceDown{ 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,6px)} }
+  .node.locked{ background: linear-gradient(160deg, #e2e8f0 0%, #cbd5e1 100%); color: #94a3b8; box-shadow: 0 5px 0 #b8c4d2, inset 0 2px 3px rgba(255,255,255,.55), inset 0 -2px 4px rgba(0,0,0,.08); cursor: default; }
+  .node.locked svg{ width: 28px; height: 28px; }
+  .node.locked:active{ transform: none; }
   .bottom-nav{ position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(255,255,255,.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -3px 14px rgba(30,64,175,.06); z-index: 3; }
   .nav-btn{ display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: 0; padding: 6px 4px; color: #94a3b8; font-size: 10px; font-weight: 700; cursor: pointer; transition: color .2s ease, transform .15s ease; }
   .nav-btn svg{ width: 24px; height: 24px; }
   .nav-btn.active{ color: #2563eb; }
   .nav-btn:active{ transform: scale(.94); }
-
-  .toast{ position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: #1e293b; color: #fff; padding: 11px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all .3s ease; z-index: 100; white-space: nowrap; box-shadow: 0 8px 20px rgba(15,23,42,.25); }
+  .toast{ position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: #1e293b; color: #fff; padding: 11px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all .3s ease; z-index: 100; white-space: nowrap; box-shadow: 0 8px 20px rgba(15,23,42,.25); max-width: 90%; text-align: center; }
   .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
+  .overlay{ position: fixed; inset: 0; background: rgba(15,23,42,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+  .overlay.show{ opacity: 1; pointer-events: auto; }
+  .lesson-card{ width: 100%; max-width: 400px; background: #fff; border-radius: 24px; padding: 28px 24px; text-align: center; box-shadow: 0 20px 60px rgba(15,23,42,.3); transform: scale(.94); transition: transform .3s ease; }
+  .overlay.show .lesson-card{ transform: scale(1); }
+  .lesson-badge{ display: inline-block; background: rgba(59,130,246,.12); color: #2563eb; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 12px; border-radius: 8px; margin-bottom: 14px; }
+  .lesson-card h2{ font-size: 22px; font-weight: 900; color: #0f172a; margin: 0 0 10px; letter-spacing: -0.3px; }
+  .lesson-card p{ font-size: 14px; color: #64748b; margin: 0 0 6px; line-height: 1.5; }
+  .lesson-stats{ display: inline-flex; gap: 16px; margin: 16px 0 22px; font-size: 13px; font-weight: 700; color: #475569; }
+  .lesson-stats span::before{ content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:#3b82f6; margin-right:6px; vertical-align: middle; }
+  .lesson-btn-row{ display: flex; flex-direction: column; gap: 10px; }
+  .btn-cta{ display: block; width: 100%; padding: 14px 26px; border: 0; border-radius: 14px; font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1; color: #fff; background: linear-gradient(180deg, #3b82f6, #1e40af); box-shadow: 0 4px 0 #1e3a8a, 0 8px 20px rgba(30,64,175,.3); cursor: pointer; touch-action: manipulation; transition: transform .15s ease; }
+  .btn-cta:active{ transform: translateY(2px); box-shadow: 0 2px 0 #1e3a8a; }
+  .btn-ghost{ display: block; width: 100%; padding: 12px; border: 0; border-radius: 14px; font-family: inherit; font-size: 14px; font-weight: 600; color: #64748b; background: transparent; cursor: pointer; }
+  .test-container{ width: 100%; max-width: 480px; height: 100%; max-height: 700px; background: #fff; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(15,23,42,.3); transform: scale(.94); transition: transform .3s ease; }
+  .overlay.show .test-container{ transform: scale(1); }
+  .test-header{ padding: 18px 20px 12px; border-bottom: 1px solid #f1f5f9; flex-shrink: 0; }
+  .test-progress{ height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+  .test-progress-fill{ height: 100%; width: 0%; background: linear-gradient(90deg, #60a5fa, #3b82f6); border-radius: 99px; transition: width .35s ease; }
+  .test-counter{ font-size: 12px; font-weight: 700; color: #64748b; text-align: right; }
+  .test-title{ font-size: 13px; font-weight: 800; color: #2563eb; margin-bottom: 8px; }
+  .test-body{ flex: 1; overflow-y: auto; padding: 22px 20px; }
+  .test-question{ font-size: 18px; font-weight: 700; color: #0f172a; line-height: 1.4; margin-bottom: 20px; }
+  .test-options{ display: flex; flex-direction: column; gap: 10px; }
+  .test-option{ padding: 14px 16px; border: 2px solid #e2e8f0; background: #f8fafc; border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.3; color: #334155; text-align: left; cursor: pointer; touch-action: manipulation; transition: all .15s ease; }
+  .test-option:hover:not(:disabled){ border-color: #93c5fd; background: #eff6ff; }
+  .test-option.selected-correct{ border-color: #22c55e; background: #dcfce7; color: #14532d; }
+  .test-option.selected-wrong{ border-color: #ef4444; background: #fee2e2; color: #7f1d1d; }
+  .test-option.show-correct{ border-color: #22c55e; background: #dcfce7; color: #14532d; }
+  .test-option:disabled{ cursor: default; }
+  .test-input-row{ display: flex; flex-direction: column; gap: 12px; }
+  .test-input{ width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; background: #f8fafc; border-radius: 12px; font-family: inherit; font-size: 16px; font-weight: 600; color: #0f172a; outline: none; transition: border-color .15s ease, background .15s ease; }
+  .test-input:focus{ border-color: #60a5fa; background: #fff; }
+  .test-input.correct{ border-color: #22c55e; background: #dcfce7; color: #14532d; }
+  .test-input.wrong{ border-color: #ef4444; background: #fee2e2; color: #7f1d1d; }
+  .test-feedback{ margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 14px; line-height: 1.5; display: none; }
+  .test-feedback.show{ display: block; }
+  .test-feedback.correct{ background: #dcfce7; color: #14532d; border-left: 4px solid #22c55e; }
+  .test-feedback.wrong{ background: #fee2e2; color: #7f1d1d; border-left: 4px solid #ef4444; }
+  .test-feedback-title{ display: block; font-weight: 800; margin-bottom: 4px; }
+  .test-footer{ padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #f1f5f9; flex-shrink: 0; }
+  .test-btn-next{ width: 100%; padding: 14px; border: 0; border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1; color: #fff; background: linear-gradient(180deg, #3b82f6, #1e40af); box-shadow: 0 3px 0 #1e3a8a; cursor: pointer; touch-action: manipulation; transition: transform .15s ease; }
+  .test-btn-next:active{ transform: translateY(2px); box-shadow: 0 1px 0 #1e3a8a; }
+  .result-card{ width: 100%; max-width: 400px; background: #fff; border-radius: 24px; padding: 32px 24px; text-align: center; box-shadow: 0 20px 60px rgba(15,23,42,.3); transform: scale(.94); transition: transform .3s ease; }
+  .overlay.show .result-card{ transform: scale(1); }
+  .result-emoji{ font-size: 56px; margin-bottom: 8px; }
+  .result-card h2{ font-size: 13px; font-weight: 700; color: #64748b; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 1.2px; }
+  .result-level{ font-size: 64px; font-weight: 900; line-height: 1; background: linear-gradient(135deg, #3b82f6, #1e40af); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 14px; letter-spacing: -2px; }
+  .result-desc{ font-size: 15px; color: #334155; line-height: 1.5; margin: 0 0 16px; }
+  .result-score{ display: inline-block; background: #f1f5f9; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 24px; }
+  .result-extra{ font-size: 12px; color: #94a3b8; margin-bottom: 16px; }
 </style>
 </head>
 <body>
 
-  <!-- ============ ЭКРАН 1: ОНБОРДИНГ ============ -->
-  <div id="intro-wrapper">
-    <div class="stage">
-      <div class="scene">
-        <div class="shadow"></div>
-        <div class="pot-wrap">
-          <div class="pot-body"></div><div class="pot-rim"></div>
-          <div class="rim-inner"></div><div class="rim-shine"></div><div class="pot-soil"></div>
-        </div>
-        <div class="dust"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="seed"></div>
-        <svg class="sprout-svg" viewBox="0 0 140 200" aria-hidden="true">
-          <defs>
-            <linearGradient id="g-stem" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#175c17"/><stop offset="45%" stop-color="#2e9b2e"/><stop offset="100%" stop-color="#8ce88c"/></linearGradient>
-            <linearGradient id="g-leafL" x1="1" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#2b8f2b"/><stop offset="50%" stop-color="#5dd45d"/><stop offset="100%" stop-color="#b3f8b3"/></linearGradient>
-            <linearGradient id="g-leafR" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#2b8f2b"/><stop offset="50%" stop-color="#5dd45d"/><stop offset="100%" stop-color="#b3f8b3"/></linearGradient>
-          </defs>
-          <g class="sprout-sway"><g class="sprout-idle">
-              <path class="stem-path" pathLength="100" d="M70,196 C71,172 67,150 69,128 C71,110 66,86 68,60" fill="none" stroke="url(#g-stem)" stroke-width="8" stroke-linecap="round"/>
-              <path class="stem-hi" pathLength="100" d="M67.5,196 C68.5,172 64.5,150 66.5,128 C68.5,110 63.5,86 65.5,60" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="2.2" stroke-linecap="round"/>
-              <ellipse class="stem-node" cx="69.5" cy="163" rx="5" ry="2.2" fill="#2c8c2c"/>
-              <g class="leaf-left"><path d="M69,128 C54,128 36,118 30,96 C44,90 60,102 69,122 Z" fill="url(#g-leafL)"/><path d="M68,125 L33,98" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/></g>
-              <g class="leaf-right"><path d="M68,96 C82,96 100,86 106,64 C92,58 76,70 68,90 Z" fill="url(#g-leafR)"/><path d="M69,93 L103,66" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/></g>
-              <g class="leaf-bud"><path d="M68,64 C63,56 60,46 62,34 C69,38 73,50 68,60 Z" fill="url(#g-leafR)"/></g>
-          </g></g>
-        </svg>
+<div id="intro-wrapper">
+  <div class="stage">
+    <div class="scene">
+      <div class="shadow"></div>
+      <div class="pot-wrap">
+        <div class="pot-body"></div><div class="pot-rim"></div>
+        <div class="rim-inner"></div><div class="rim-shine"></div><div class="pot-soil"></div>
       </div>
-      <div class="caption">
-        <div class="day">Day 1</div>
-        <div>
+      <div class="dust"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="seed"></div>
+      <svg class="sprout-svg" viewBox="0 0 140 200" aria-hidden="true">
+        <defs>
+          <linearGradient id="g-stem" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#175c17"/><stop offset="45%" stop-color="#2e9b2e"/><stop offset="100%" stop-color="#8ce88c"/></linearGradient>
+          <linearGradient id="g-leafL" x1="1" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#2b8f2b"/><stop offset="50%" stop-color="#5dd45d"/><stop offset="100%" stop-color="#b3f8b3"/></linearGradient>
+          <linearGradient id="g-leafR" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#2b8f2b"/><stop offset="50%" stop-color="#5dd45d"/><stop offset="100%" stop-color="#b3f8b3"/></linearGradient>
+        </defs>
+        <g class="sprout-sway">
+          <g class="sprout-idle">
+            <path class="stem-path" pathLength="100" d="M70,196 C71,172 67,150 69,128 C71,110 66,86 68,60" fill="none" stroke="url(#g-stem)" stroke-width="8" stroke-linecap="round"/>
+            <path class="stem-hi" pathLength="100" d="M67.5,196 C68.5,172 64.5,150 66.5,128 C68.5,110 63.5,86 65.5,60" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="2.2" stroke-linecap="round"/>
+            <ellipse class="stem-node" cx="69.5" cy="163" rx="5" ry="2.2" fill="#2c8c2c"/>
+            <g class="leaf-left"><path d="M69,128 C54,128 36,118 30,96 C44,90 60,102 69,122 Z" fill="url(#g-leafL)"/><path d="M68,125 L33,98" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/><path d="M56,113 L50,104 M46,105 L39,99 M60,119 L57,111" stroke="#2f8f2f" stroke-width="1" fill="none" opacity=".35" stroke-linecap="round"/></g>
+            <g class="leaf-right"><path d="M68,96 C82,96 100,86 106,64 C92,58 76,70 68,90 Z" fill="url(#g-leafR)"/><path d="M69,93 L103,66" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/><path d="M82,82 L90,74 M92,76 L99,71 M78,88 L76,80" stroke="#2f8f2f" stroke-width="1" fill="none" opacity=".35" stroke-linecap="round"/></g>
+            <g class="leaf-bud"><path d="M68,64 C63,56 60,46 62,34 C69,38 73,50 68,60 Z" fill="url(#g-leafR)"/><path d="M67,60 L64,40" stroke="#3aa33a" stroke-width="1" fill="none" opacity=".45" stroke-linecap="round"/></g>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="caption">
+      <div class="day">Day 1</div>
+      <div><button type="button" class="cta" id="start-btn">Начать заниматься</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="main-screen">
+  <div class="app-shell">
+    <header class="top-bar">
+      <div class="stats">
+        <div class="stat stat-fire" title="Серия дней">
+          <svg class="stat-anim" viewBox="-100 -140 200 260" aria-hidden="true">
+            <defs>
+              <radialGradient id="fireGlowGrad" cx="50%" cy="60%" r="55%"><stop offset="0%" stop-color="#ffaa33" stop-opacity="0.35"/><stop offset="55%" stop-color="#ff5500" stop-opacity="0.12"/><stop offset="100%" stop-color="#ff0000" stop-opacity="0"/></radialGradient>
+              <style>
+                @keyframes fireFlick1 { 0%,100%{transform:scale(1,1) rotate(0)} 25%{transform:scale(.97,1.04) rotate(-.8deg)} 55%{transform:scale(1.03,.97) rotate(.7deg)} 80%{transform:scale(.99,1.02) rotate(-.3deg)} }
+                @keyframes fireFlick2 { 0%,100%{transform:scale(1,1) rotate(0)} 33%{transform:scale(.94,1.06) rotate(1deg)} 66%{transform:scale(1.05,.95) rotate(-.7deg)} }
+                @keyframes fireFlick3 { 0%,100%{transform:scale(1,1) rotate(0)} 50%{transform:scale(.92,1.08) rotate(-.6deg)} }
+                @keyframes fireGlowPulse { 0%,100%{opacity:1} 50%{opacity:.75} }
+                .fire-outer,.fire-mid,.fire-inner{ transform-box: fill-box; transform-origin: 50% 100%; }
+                .fire-outer{animation: fireFlick1 .85s ease-in-out infinite} .fire-mid{animation: fireFlick2 .65s ease-in-out infinite} .fire-inner{animation: fireFlick3 .5s ease-in-out infinite} .fire-glow{animation: fireGlowPulse 1.5s ease-in-out infinite}
+              </style>
+            </defs>
+            <ellipse class="fire-glow" cx="0" cy="10" rx="95" ry="115" fill="url(#fireGlowGrad)"/>
+            <path class="fire-outer" fill="#ff3a00" d="M 0,-105 C 30,-70 55,-40 58,-5 C 60,25 55,55 42,78 C 29,101 15,105 0,105 C -15,105 -29,101 -42,78 C -55,55 -60,25 -58,-5 C -55,-40 -30,-70 0,-105 Z"/>
+            <path class="fire-mid" fill="#ffaa1a" d="M 0,-55 C 24,-32 42,-3 45,22 C 47,46 37,68 24,82 C 13,95 6,98 0,98 C -6,98 -13,95 -24,82 C -37,68 -47,46 -45,22 C -42,-3 -24,-32 0,-55 Z"/>
+            <path class="fire-inner" fill="#fff2a8" d="M 0,-20 C 18,-5 30,15 32,35 C 34,55 27,72 15,85 C 8,94 4,98 0,98 C -4,98 -8,94 -15,85 C -27,72 -34,55 -32,35 C -30,15 -18,-5 0,-20 Z"/>
+          </svg>
+          <span class="stat-num" id="streak-num">0</span>
+        </div>
+        <div class="stat stat-gem" title="Кристаллы"><canvas id="gem-canvas" class="stat-anim"></canvas><span class="stat-num" id="gems-num">0</span></div>
+        <div class="stat stat-life" title="Жизни"><canvas id="life-canvas" class="stat-anim"></canvas><span class="stat-num">5</span></div>
+      </div>
+      <button class="avatar-btn" aria-label="Профиль" id="avatar-btn">G</button>
+    </header>
+
+    <div class="content">
+      <div class="daily-card">
+        <div class="daily-top">
+          <div>
+            <div class="daily-title">Дневная цель</div>
+            <div class="daily-sub">Осталось 4 часа до конца дня</div>
+          </div>
+          <div class="daily-count"><strong id="xp-current">0</strong> / 50 XP</div>
+        </div>
+        <div class="daily-bar"><div class="daily-fill" id="daily-fill"></div></div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-label">Раздел 1 · Food & Drinks</span>
+        <h2 class="section-title">Еда и напитки <span id="level-badge" class="level-badge" style="display:none;">A1</span></h2>
+      </div>
+
+      <div class="path" id="path"></div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 L12 3 L21 11"/><path d="M5 9.5 L5 20 L19 20 L19 9.5"/><path d="M10 20 L10 14 L14 14 L14 20"/></svg>
+        <span>Учить</span>
+      </button>
+      <button class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/><path d="M9 12 L15 12"/></svg>
+        <span>Тренировка</span>
+      </button>
+      <button class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 L16 4 L16 10 Q16 14 12 14 Q8 14 8 10 Z"/><path d="M12 14 L12 20"/><path d="M8 20 L16 20"/><path d="M8 6 L4 6 L4 9 Q4 11 6 11"/><path d="M16 6 L20 6 L20 9 Q20 11 18 11"/></svg>
+        <span>Рейтинг</span>
+      </button>
+      <button class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21 Q4 15 12 15 Q20 15 20 21"/></svg>
+        <span>Профиль</span>
+      </button>
+    </nav>
+
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<div id="lesson-intro" class="overlay">
+  <div class="lesson-card">
+    <div class="lesson-badge" id="lesson-badge">Урок</div>
+    <h2 id="lesson-title">Определяем твой уровень</h2>
+    <p id="lesson-desc">Ответь на 22 вопроса — и мы подберём подходящий уровень английского.</p>
+    <div class="lesson-stats">
+      <span id="lesson-count">22 вопроса</span>
+      <span>~5 минут</span>
+    </div>
+    <div class="lesson-btn-row">
+      <button class="btn-cta" id="begin-test-btn" type="button">Пройти</button>
+      <button class="btn-ghost" id="cancel-lesson-btn" type="button">Позже</button>
+    </div>
+  </div>
+</div>
+
+<div id="test-screen" class="overlay">
+  <div class="test-container">
+    <div class="test-header">
+      <div class="test-title" id="test-title">Тест на уровень</div>
+      <div class="test-progress"><div class="test-progress-fill" id="test-progress-fill"></div></div>
+      <div class="test-counter" id="test-counter">1 / 22</div>
+    </div>
+    <div class="test-body">
+      <div class="test-question" id="test-question"></div>
+      <div id="test-answer-area"></div>
+      <div class="test-feedback" id="test-feedback"></div>
+    </div>
+    <div class="test-footer">
+      <button class="test-btn-next" id="test-next-btn" type="button" style="display:none;">Дальше</button>
+    </div>
+  </div>
+</div>
+
+<div id="result-screen" class="overlay">
+  <div class="result-card">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <h2 id="result-h2">Твой уровень</h2>
+    <div class="result-level" id="result-level">B1</div>
+    <p class="result-desc" id="result-desc"></p>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-extra" id="result-extra" style="display:none;"></div>
+    <button class="btn-cta" id="finish-test-btn" type="button">Продолжить</button>
+  </div>
+</div>
+
+<script>
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  document.getElementById('start-btn').addEventListener('click', () => {
+    document.getElementById('intro-wrapper').classList.add('hidden');
+    setTimeout(() => document.getElementById('main-screen').classList.add('active'), 400);
+  });
+
+  const toastEl = document.getElementById('toast');
+  let toastTimer = null;
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  }
+
+  const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+  const STAR_SVG  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+  const LOCK_SVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  const TEST_SVG  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+
+  const WORDS = {
+    A1_L1: [{en:'apple',ru:'яблоко'},{en:'bread',ru:'хлеб'},{en:'milk',ru:'молоко'},{en:'water',ru:'вода'},{en:'egg',ru:'яйцо'},{en:'rice',ru:'рис'},{en:'tea',ru:'чай'},{en:'coffee',ru:'кофе'}],
+    A1_L4: [{en:'fish',ru:'рыба'},{en:'meat',ru:'мясо'},{en:'cheese',ru:'сыр'},{en:'fruit',ru:'фрукт'},{en:'juice',ru:'сок'},{en:'butter',ru:'масло'},{en:'sugar',ru:'сахар'},{en:'salt',ru:'соль'}],
+    A2_L1: [{en:'breakfast',ru:'завтрак'},{en:'lunch',ru:'обед'},{en:'dinner',ru:'ужин'},{en:'snack',ru:'перекус'},{en:'dessert',ru:'десерт'},{en:'menu',ru:'меню'},{en:'bill',ru:'счёт'},{en:'meal',ru:'приём пищи'}],
+    B1_L1: [{en:'crispy',ru:'хрустящий'},{en:'spicy',ru:'острый'},{en:'sour',ru:'кислый'},{en:'creamy',ru:'сливочный'},{en:'bitter',ru:'горький'},{en:'sweet',ru:'сладкий'},{en:'salty',ru:'солёный'},{en:'savoury',ru:'несладкий'}],
+    B2_L1: [{en:'plant-based',ru:'растительный'},{en:'processed',ru:'обработанный'},{en:'organic',ru:'органический'},{en:'balanced',ru:'сбалансированный'},{en:'cut down on',ru:'сократить потребление'},{en:'diet',ru:'диета'},{en:'nutrition',ru:'питание'},{en:'junk food',ru:'вредная еда'}]
+  };
+
+  function shuffle(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+  function genVocab(words){
+    const qs = [];
+    shuffle(words).slice(0,4).forEach(w => {
+      const others = shuffle(words.filter(x=>x!==w)).slice(0,2);
+      const opts = shuffle([w, ...others]);
+      qs.push({q:`Что означает «${w.en}»?`, o: opts.map(x=>x.ru), a: opts.indexOf(w), e:`«${w.en}» = «${w.ru}»`});
+    });
+    shuffle(words).slice(0,4).forEach(w => {
+      const others = shuffle(words.filter(x=>x!==w)).slice(0,2);
+      const opts = shuffle([w, ...others]);
+      qs.push({q:`Как переводится «${w.ru}»?`, o: opts.map(x=>x.en), a: opts.indexOf(w), e:`«${w.ru}» = «${w.en}»`});
+    });
+    return qs;
+  }
+
+  // FIX: убрал поле `ph` из вопросов с вводом — раньше плейсхолдер показывал правильный ответ
+  const FIXED = {
+    A1: {
+      2: [
+        {q:'I ___ apples.',o:['like','likes','liking'],a:0,e:"С 'I' — 'like'."},
+        {q:'She ___ coffee.',o:['like','likes','liking'],a:1,e:"С he/she/it — 'likes'."},
+        {q:"I ___ like fish.",o:["don't","doesn't","not"],a:0,e:"С 'I' — 'don't like'."},
+        {q:'He ___ like milk.',o:["don't","doesn't","not"],a:1,e:"С he/she/it — 'doesn't like'."},
+        {q:'___ you like tea?',o:['Do','Does','Are'],a:0,e:"С 'you' — 'Do'."},
+        {q:"I like rice, ___ I don't like bread.",o:['but','and','or'],a:0,e:"Противопоставление — 'but'."},
+        {q:"Переведи «Я люблю кофе»: I ___ coffee.",ans:['like'],e:'I like coffee.'},
+        {q:"Переведи «Я не люблю рыбу»: I ___ like fish.",ans:["don't","do not"],e:"I don't like fish."}
+      ],
+      3: [
+        {q:'I eat ___ apple every day.',o:['a','an','some'],a:1,e:"'Apple' на гласную → 'an'."},
+        {q:'She drinks ___ milk.',o:['a','an','some'],a:2,e:"'Milk' неисчисл. → 'some'."},
+        {q:'I want ___ banana.',o:['a','an','some'],a:0,e:"'Banana' на согласную → 'a'."},
+        {q:'We have ___ bread.',o:['a','an','some'],a:2,e:"'Bread' неисчисл. → 'some'."},
+        {q:'Can I have ___ orange?',o:['a','an','some'],a:1,e:"'Orange' на гласную → 'an'."},
+        {q:'He eats ___ rice every day.',o:['a','an','some'],a:2,e:"'Rice' неисчисл. → 'some'."},
+        {q:'There is ___ egg on the table.',o:['a','an','some'],a:1,e:"'Egg' на гласную → 'an'."},
+        {q:'I need ___ water.',o:['a','an','some'],a:2,e:"'Water' неисчисл. → 'some'."}
+      ],
+      5: [
+        {q:"Официант: 'What would you like?' — Вы:",o:["A coffee, please.","Yes, I am.","It's OK."],a:0,e:"На вопрос о заказе — заказ."},
+        {q:"'Can I have a coffee, please?' — Официант:",o:['Sure.','No, I am.','Yes, apple.'],a:0,e:"'Sure' = 'Конечно'."},
+        {q:"'How much is it?' — Официант:",o:["It's 3 dollars.","I'm fine.","Yes, please."],a:0,e:"Называют цену."},
+        {q:"'Here you are.' — Вы:",o:['Thank you.','Yes, I do.','OK, apple.'],a:0,e:"'Вот, возьмите' → 'Спасибо'."},
+        {q:"'Can I have the bill, please?' — Официант:",o:['Of course.','No, I am.','You like it?'],a:0,e:"'Of course' = 'Конечно'."},
+        {q:"'Do you want tea or coffee?' — Вы:",o:['Coffee, please.','Yes, I do.','OK, 3.'],a:0,e:"Выбор — называют желаемое."},
+        {q:"'Have a nice day!' — Вы:",o:['You too!','Yes, I do.','OK, apple.'],a:0,e:"'You too' = 'И тебе'."},
+        {q:"'What would you like?' — Вы: '___ I have a tea?'",ans:['can'],e:"'Can I have...' — просьба."}
+      ]
+    },
+    A2: {
+      2: [
+        {q:'___ I have a coffee, please?',o:['Can','Do','Am'],a:0,e:"Просьба — 'Can I have...'."},
+        {q:"I'd ___ a sandwich, please.",o:['like','likes','liking'],a:0,e:"'I'd like' = 'Я бы хотел'."},
+        {q:'___ you like some tea?',o:['Would','Do','Are'],a:0,e:"'Would you like...' — предложение."},
+        {q:"I'd like ___ apple.",o:['an','a','some'],a:0,e:"'Apple' на гласную → 'an'."},
+        {q:'Can I have ___ water?',o:['some','a','an'],a:0,e:"'Water' неисчисл. → 'some'."},
+        {q:"Переведи «Я бы хотел кофе»: I'd ___ a coffee.",ans:['like'],e:"I'd like a coffee."},
+        {q:"Переведи «Можно мне меню?»: Can I have the ___, please?",ans:['menu'],e:"Can I have the menu."},
+        {q:"'Would you like some cake?' — '___'",o:["Yes, please.","Yes, I do.","It's cake."],a:0,e:"'Yes, please' — вежливо."}
+      ],
+      3: [
+        {q:'How ___ apples do you have?',o:['many','much','any'],a:0,e:"'Apples' исчисл. → 'many'."},
+        {q:'How ___ milk do you need?',o:['much','many','some'],a:0,e:"'Milk' неисчисл. → 'much'."},
+        {q:"There aren't ___ apples.",o:['any','some','many'],a:0,e:"В отрицаниях — 'any'."},
+        {q:'I have ___ bread.',o:['some','any','much'],a:0,e:"В утверждениях — 'some'."},
+        {q:'Do you have ___ tea?',o:['any','some','much'],a:0,e:"В вопросах — 'any'."},
+        {q:'How ___ sugar do you want?',o:['much','many','some'],a:0,e:"'Sugar' неисчисл. → 'much'."},
+        {q:'There is ___ milk in the fridge.',o:['some','any','much'],a:0,e:"Утвержд. — 'some'."},
+        {q:"Переведи «Сколько у тебя яиц?»: How ___ eggs?",ans:['many'],e:"'Eggs' исчисл. → 'many'."}
+      ],
+      4: [
+        {q:"Меню: «Soup — $5». Сколько стоит суп?",o:['$5','$3','$7'],a:0,e:"В меню $5."},
+        {q:"«Coffee $2, Tea $1». Что дешевле?",o:['Tea','Coffee','Одинаково'],a:0,e:"$1 < $2 — чай дешевле."},
+        {q:"«Chicken salad — contains chicken and lettuce». Вегетарианское?",o:['Нет','Да','Может быть'],a:0,e:"Курица — не вегетарианское."},
+        {q:"«Ice cream — $4». Что это?",o:['Десерт','Основное блюдо','Напиток'],a:0,e:"Мороженое — десерт."},
+        {q:"«Breakfast: 7am-10am». Когда завтрак?",o:['7:00-10:00','10:00-12:00','12:00-14:00'],a:0,e:"7am-10am."},
+        {q:"«Water — free». Сколько стоит вода?",o:['Бесплатно','$1','$2'],a:0,e:"«Free» = бесплатно."},
+        {q:"«Pizza — Italian food». Откуда пицца?",o:['Италия','Франция','Испания'],a:0,e:"«Italian» — итальянская."},
+        {q:"«Orange juice — $3». Что это?",o:['Напиток','Десерт','Суп'],a:0,e:"Сок — напиток."}
+      ],
+      5: [
+        {q:'___ money do you have?',o:['How much','How many','How'],a:0,e:"'Money' неисчисл. → 'How much'."},
+        {q:'___ books are there?',o:['How many','How much','How'],a:0,e:"'Books' исчисл. → 'How many'."},
+        {q:'___ sugar in the tea?',o:['How much','How many','How'],a:0,e:"'Sugar' неисчисл. → 'How much'."},
+        {q:'___ eggs do we need?',o:['How many','How much','How'],a:0,e:"'Eggs' исчисл. → 'How many'."},
+        {q:"Переведи «Сколько воды?»: ___ ___ water?",ans:['how much'],e:"'Water' неисчисл."},
+        {q:"Переведи «Сколько яблок?»: ___ ___ apples?",ans:['how many'],e:"'Apples' исчисл."},
+        {q:'___ apples? — I need three.',o:['How many','How much','Some'],a:0,e:"Яблоки считаем → 'How many'."},
+        {q:'___ coffee? — Just a little.',o:['How much','How many','Any'],a:0,e:"Кофе неисчисл. → 'How much'."}
+      ]
+    },
+    B1: {
+      2: [
+        {q:"___ wash the vegetables. (первый шаг)",o:['First','Finally','After that'],a:0,e:"Первый шаг — 'First'."},
+        {q:"___ cut them into small pieces.",o:['Then','Finally','First'],a:0,e:"После первого — 'Then'."},
+        {q:"___ add some salt.",o:['Next','First','Finally'],a:0,e:"Далее — 'Next'."},
+        {q:"___ mix everything.",o:['After that','First','Finally'],a:0,e:"Продолжение — 'After that'."},
+        {q:"___ serve the dish.",o:['Finally','First','Then'],a:0,e:"Последний — 'Finally'."},
+        {q:"Какое слово идёт первым в рецепте?",o:['First','Finally','Next'],a:0,e:"'First' — первый."},
+        {q:"Какое слово идёт последним?",o:['Finally','First','Next'],a:0,e:"'Finally' — последний."},
+        {q:"___ heat the oil in a pan. (первый шаг)",ans:['first'],e:"Первый — 'First'."}
+      ],
+      3: [
+        {q:"'I'm not a big fan of fish' = ",o:["I don't really like fish.","I love fish.","Fish is terrible."],a:0,e:"'Not a big fan' = 'не очень люблю'."},
+        {q:"Вежливая форма — не любить:",o:["I'm not a big fan of...","I hate...","It's disgusting."],a:0,e:"'Not a big fan' — вежливо."},
+        {q:"I'm not a big fan ___ coffee.",ans:['of'],e:"'fan of' — предлог 'of'."},
+        {q:"'I'm a ___ fan of pizza.' (люблю)",o:['big','small','not'],a:0,e:"'Big fan' = 'большой поклонник'."},
+        {q:"Что более вежливо?",o:["I'm not a big fan of it.","I hate it.","I don't want it."],a:0,e:"Вежливее — 'not a big fan'."},
+        {q:"'She's ___ fan of spicy food.'",o:['not a big','a big not','not big a'],a:0,e:"'Not a big fan of'."},
+        {q:"'I don't like fish much' → ",o:["I'm not a big fan of fish.","I love fish.","Fish is my favorite."],a:0,e:"Значение одинаковое."},
+        {q:"'I love chocolate' → ",o:["I'm a big fan of chocolate.","I don't like chocolate.","Chocolate is OK."],a:0,e:"'Big fan' = 'очень люблю'."}
+      ],
+      4: [
+        {q:"'Would you like to see the menu?' — что предлагает?",o:['Показать меню','Принести воду','Оплатить счёт'],a:0,e:"'Menu' — меню."},
+        {q:"'Can I get the bill?' — что вы хотите?",o:['Оплатить счёт','Заказать еду','Уйти'],a:0,e:"'Bill' — счёт."},
+        {q:"'Is the tip included?' — о чём?",o:['Про чаевые','Про счёт','Про еду'],a:0,e:"'Tip' — чаевые."},
+        {q:"'I'll have the soup, please.' — что значит 'have'?",o:['Закажу','Имею','Ем'],a:0,e:"'I'll have' = 'Я буду'."},
+        {q:"'The dish was delicious.' = ",o:['Очень вкусно','Очень дорого','Очень холодно'],a:0,e:"'Delicious' = вкусный."},
+        {q:"'Could I get this to go?' — вы хотите:",o:['С собой','Здесь','Оплатить'],a:0,e:"'To go' = 'с собой'."},
+        {q:"'Are you ready to order?' — что спрашивают?",o:['Готовы заказать?','Хотите счёт?','Всё вкусно?'],a:0,e:"'Order' = заказ."},
+        {q:"Переведи «Я бы хотел оплатить счёт»: I'd like to ___ the check.",ans:['pay'],e:"'Pay the check'."}
+      ],
+      5: [
+        {q:'___ you ever ___ sushi?',o:['Have / tried','Did / tried','Have / try'],a:0,e:"Present Perfect: 'Have you ever tried'."},
+        {q:'I ___ never ___ Mexican food.',o:['have / tried','has / tried','had / try'],a:0,e:"'I have never tried'."},
+        {q:'She ___ already ___ lunch.',o:['has / eaten','have / eaten','had / eat'],a:0,e:"'She has already eaten'."},
+        {q:'___ you tried Thai food?',o:['Have','Has','Did'],a:0,e:"С 'you' — 'Have'."},
+        {q:'I ___ ___ to a French restaurant.',o:["haven't / been","hasn't / been","didn't / be"],a:0,e:"'I haven't been'."},
+        {q:'Have you ever ___ Indian food? (пробовал)',ans:['tried'],e:"'Have you ever tried'."},
+        {q:'I have never ___ sushi. (пробовал)',ans:['tried','eaten'],e:"'never tried/eaten'."},
+        {q:'Have you ever ___ to a Japanese restaurant?',o:['been','gone','went'],a:0,e:"'Have you ever been to'."}
+      ]
+    },
+    B2: {
+      2: [
+        {q:"«A new study shows that eating vegetables reduces heart disease.» Что показало исследование?",o:['Овощи снижают риск болезней сердца','Овощи вредны','Ничего'],a:0,e:"'Reduces heart disease' = снижает."},
+        {q:"«Many people choose plant-based diets for environmental reasons.» Почему?",o:['Из-за экологии','Из-за денег','Из-за моды'],a:0,e:"'Environmental reasons'."},
+        {q:"«Processed foods are often high in sugar and salt.» Что в еде?",o:['Сахар и соль','Только соль','Только сахар'],a:0,e:"'High in sugar and salt'."},
+        {q:"«Experts recommend a balanced diet.» Что рекомендуют?",o:['Сбалансированное питание','Только фрукты','Голодание'],a:0,e:"'Balanced diet'."},
+        {q:"«Reducing meat intake can lower the risk of heart disease.» Что даёт?",o:['Снижает риск болезней сердца','Повышает','Ничего'],a:0,e:"'Lower the risk' = снижает."},
+        {q:"«Not all plant-based foods are healthy.» Все полезны?",o:['Нет','Да','Не сказано'],a:0,e:"'Not all' = не все."},
+        {q:"«Organic food is often more expensive.» Что про органическую еду?",o:['Дороже','Дешевле','Бесплатно'],a:0,e:"'More expensive' = дороже."},
+        {q:"«A balanced approach is best for long-term health.» Что лучше?",o:['Сбалансированный подход','Короткие диеты','Пропуск еды'],a:0,e:"'Balanced approach'."}
+      ],
+      3: [
+        {q:"'I've cut down on sugar' = ",o:['Я ем меньше сахара','Я ем много сахара','Я не ем сахар'],a:0,e:"'Cut down on' = 'сократить'."},
+        {q:"'Cut down on' means:",o:['reduce','increase','stop completely'],a:0,e:"'Сократить', не 'прекратить'."},
+        {q:"'She has cut down on coffee.' — время?",o:['Present Perfect','Past Simple','Present Simple'],a:0,e:"'has cut down' — Present Perfect."},
+        {q:"Переведи «Я сократил мясо»: I've ___ down on meat.",ans:['cut'],e:"'I've cut down on'."},
+        {q:"I'm trying to ___ junk food.",o:['cut down on','eat more','love'],a:0,e:"'Cut down on junk food'."},
+        {q:"Перефразируй: «I eat less chocolate now»",o:["I've cut down on chocolate.","I love chocolate.","I eat more chocolate."],a:0,e:"Past → Present Perfect."},
+        {q:"Which is Present Perfect?",o:['have cut down','cut down','will cut down'],a:0,e:"'have + past participle'."},
+        {q:"He ___ down on salt. (Present Perfect)",ans:['has cut'],e:"'He has cut down'."}
+      ],
+      4: [
+        {q:'If I ___ less sugar, I would feel better.',o:['ate','eat','will eat'],a:0,e:"2-й тип: 'If I ate'."},
+        {q:"If I ___ more vegetables, I'd be healthier.",o:['ate','eat','will eat'],a:0,e:"2-й тип: 'If I ate'."},
+        {q:'I would eat less meat if I ___ vegetarian.',o:['were','am','will be'],a:0,e:"2-й тип: 'If I were'."},
+        {q:"If you ___ more water, you'd feel better.",o:['drank','drink','will drink'],a:0,e:"2-й тип: 'If you drank'."},
+        {q:'If I ate less sugar, I ___ feel better.',ans:['would'],e:"'would + verb'."},
+        {q:'If I had known, I ___ cooked meat.',o:["wouldn't have","didn't","don't"],a:0,e:"3-й тип."},
+        {q:'If I ___ less meat, I would save money.',ans:['ate'],e:"2-й тип: 'If I ate'."},
+        {q:'I would try vegan cheese if I ___ it.',o:['found','find','will find'],a:0,e:"2-й тип: 'If I found'."}
+      ],
+      5: [
+        {q:"'In my opinion...' — цель:",o:['Поделиться мнением','Задать вопрос','Оплатить'],a:0,e:"'In my opinion' = по моему мнению."},
+        {q:"Какое высказывание — сильный аргумент?",o:['According to studies, ...','I think so.','Maybe.'],a:0,e:"Ссылка на исследование — сильнее."},
+        {q:"'I see your point, but...' — значение:",o:['Вежливо не согласиться','Согласиться','Спросить'],a:0,e:"'Вижу твою точку, но...'."},
+        {q:"'On the one hand..., on the other hand...' — цель:",o:['Сравнить две стороны','Задать вопрос','Оплатить'],a:0,e:"Сравнение точек зрения."},
+        {q:"Лучшее начало для мнения:",o:['In my view, ...','Wrong!','Nobody cares'],a:0,e:"'In my view' — вежливо."},
+        {q:"'I tend to believe...' — значение:",o:['Я склонен думать','Я не верю','Я знаю точно'],a:0,e:"'Tend to believe'."},
+        {q:"___ my opinion, fast food should be limited.",ans:['in'],e:"'In my opinion'."},
+        {q:"Самое формальное:",o:['I would argue that','I think','I dunno'],a:0,e:"'I would argue that' — формально."}
+      ]
+    }
+  };
+
+  // FIX: убрал ph, чтобы плейсхолдер не показывал правильный ответ
+  const LEVEL_TEST_RAW = [
+    {type:'input',level:'A1',q:'My sister ___ a doctor.',answers:['is'],explanation:"С 'My sister' — 'is'."},
+    {type:'choice',level:'A1',q:'___ you like green tea?',options:['Do','Does','Are'],answer:0,explanation:"С 'you' — 'Do'."},
+    {type:'choice',level:'A1',q:'There ___ two parks near my house.',options:['is','be','are'],answer:2,explanation:"'Two parks' — мн.ч. → 'are'."},
+    {type:'input',level:'A1',q:"I get up ___ seven o'clock.",answers:['at'],explanation:"С точным временем — 'at'."},
+    {type:'choice',level:'A1',q:'This is Aziz. ___ brother lives in Bukhara.',options:['His','He','Him'],answer:0,explanation:"Перед сущ. — 'His'."},
+    {type:'choice',level:'A1',q:'Be quiet, please. We ___ a film right now.',options:['watch','are watching','watches'],answer:1,explanation:"'Right now' → Present Continuous."},
+    {type:'input',level:'A2',q:'Last summer we ___ to Khiva.',answers:['went'],explanation:"'Last summer' → 'went'."},
+    {type:'choice',level:'A2',q:'Dilshod is ___ than his brother.',options:['tall','taller','more tall'],answer:1,explanation:"Сравнит. степень — 'taller'."},
+    {type:'choice',level:'A2',q:'I ___ never been to London.',options:['have','did','was'],answer:0,explanation:"'never been' → Present Perfect 'have'."},
+    {type:'choice',level:'A2',q:"You ___ wear a seatbelt in a car. It's the law.",options:['must','might','could'],answer:0,explanation:"Сильная обязанность — 'must'."},
+    {type:'choice',level:'A2',q:'When you called, I ___ dinner.',options:['cooked','was cooking','cook'],answer:1,explanation:"Процесс в прошлом — Past Continuous."},
+    {type:'choice',level:'B1',q:"If it ___ tomorrow, we'll stay at home.",options:['rains','will rain','rained'],answer:0,explanation:"1-й тип: после if — Present Simple."},
+    {type:'input',level:'B1',q:"I've lived in Tashkent ___ 2019.",answers:['since'],explanation:"С моментом в прошлом — 'since'."},
+    {type:'choice',level:'B1',q:'This madrasa ___ in the fifteenth century.',options:['built','was built','has built'],answer:1,explanation:"Страд. залог Past Simple."},
+    {type:'choice',level:'B1',q:'She asked me where ___.',options:['I lived','did I live','do I live'],answer:0,explanation:"Косвенная речь — без 'did'."},
+    {type:'input',level:'B1',q:"I'm not used to ___ up so early.",answers:['getting'],explanation:"'used to' (привык) + -ing."},
+    {type:'choice',level:'B1',q:'The lecture was so ___ that half the students fell asleep.',options:['bored','boring','bore'],answer:1,explanation:"Описание предмета — 'boring'."},
+    {type:'choice',level:'B2',q:'If I ___ about the traffic, I would have left earlier.',options:['knew','had known','know'],answer:1,explanation:"3-й тип: 'had known'."},
+    {type:'input',level:'B2',q:'The new manager is very ___; she always listens.',answers:['approachable'],explanation:"'Approachable' — открытый."},
+    {type:'choice',level:'B2',q:"I'd rather you ___ tell anyone about this.",options:["don't","didn't","won't"],answer:1,explanation:"'I'd rather you' + Past Simple."},
+    {type:'choice',level:'B2',q:'The project ___ by the end of next month.',options:['will complete','will be completed','completes'],answer:1,explanation:"Future Simple Passive."},
+    {type:'input',level:'B2',q:'She spoke ___ enough for everyone to understand.',answers:['clearly'],explanation:"После глагола — наречие 'clearly'."}
+  ];
+  function convertTestQ(q){
+    if (q.type === 'choice') return {q:q.q, o:q.options, a:q.answer, e:q.explanation};
+    return {q:q.q, ans:q.answers, e:q.explanation};
+  }
+  const LEVEL_TEST = shuffle(LEVEL_TEST_RAW.map(convertTestQ));
+
+  const LEVELS = ['A1','A2','B1','B2'];
+  const LESSON_META = {
+    'level-test': {name:'Определи свой уровень', desc:'Ответь на 22 вопроса — и мы подберём подходящий уровень.', count:22},
+    A1: [
+      {name:'Еда: базовые слова', desc:'Первые слова о еде: apple, bread, milk и другие.'},
+      {name:"«I like / I don't like»", desc:'Как говорить о том, что нравится и не нравится.'},
+      {name:'a / an / some', desc:'Артикли и слова количества с едой.'},
+      {name:'Ещё слова о еде', desc:'Fish, meat, cheese, juice, sugar и другие.'},
+      {name:'Диалог в кафе', desc:'Заказ еды и напитков.'},
+      {name:'Повторение', desc:'Мини-тест по всему модулю.'}
+    ],
+    A2: [
+      {name:'Приёмы пищи', desc:'Breakfast, lunch, dinner и другие.'},
+      {name:"«Can I have / I'd like»", desc:'Как заказать еду и напитки.'},
+      {name:'much / many / some / any', desc:'Слова количества.'},
+      {name:'Читаем меню', desc:'Понимаем меню на английском.'},
+      {name:'«How many? / How much?»', desc:'Спрашиваем о количестве.'},
+      {name:'Повторение', desc:'Мини-тест по всему модулю.'}
+    ],
+    B1: [
+      {name:'Вкусы и текстура', desc:'Crispy, spicy, sour, creamy и другие.'},
+      {name:'Пишем рецепт', desc:'First, Then, Next, After that, Finally.'},
+      {name:"«I'm not a big fan of…»", desc:'Вежливо говорим о нелюбимой еде.'},
+      {name:'В ресторане', desc:'Диалоги и фразы в ресторане.'},
+      {name:'«Have you ever tried…?»', desc:'Present Perfect о еде.'},
+      {name:'Повторение', desc:'Мини-тест по всему модулю.'}
+    ],
+    B2: [
+      {name:'Диеты и привычки', desc:'Plant-based, processed, cut down on и другие.'},
+      {name:'Читаем о питании', desc:'Мини-статьи и понимание.'},
+      {name:"«I've cut down on…»", desc:'Как сказать о сокращении чего-либо.'},
+      {name:'Условные предложения', desc:'«If I ate less sugar…»'},
+      {name:'Мнение и аргументы', desc:'Учимся выражать мнение.'},
+      {name:'Повторение', desc:'Мини-тест по всему модулю.'}
+    ]
+  };
+
+  function getOwnLessonQuestions(level, lessonIdx){
+    if (lessonIdx === 1) {
+      const wb = WORDS[level+'_L1'];
+      return wb ? genVocab(wb) : [];
+    }
+    if (level === 'A1' && lessonIdx === 4) {
+      return genVocab(WORDS.A1_L4);
+    }
+    if (lessonIdx === 6) {
+      const pool = [];
+      for (let i = 1; i <= 5; i++) pool.push(...getOwnLessonQuestions(level, i));
+      return shuffle(pool).slice(0, 8);
+    }
+    const arr = FIXED[level] && FIXED[level][lessonIdx];
+    return arr ? arr.slice(0, 8) : [];
+  }
+
+  function getHigherQuestion(level){
+    const idx = LEVELS.indexOf(level);
+    const higher = LEVELS.slice(idx + 1);
+    if (higher.length === 0) {
+      const pool = [];
+      for (let i = 1; i <= 5; i++) pool.push(...getOwnLessonQuestions('B2', i));
+      return shuffle(pool)[0] || null;
+    }
+    const hl = higher[Math.floor(Math.random() * higher.length)];
+    const lIdx = 1 + Math.floor(Math.random() * 5);
+    const pool = getOwnLessonQuestions(hl, lIdx);
+    return shuffle(pool)[0] || null;
+  }
+
+  function buildLesson(level, lessonIdx){
+    const own = getOwnLessonQuestions(level, lessonIdx).slice(0, 8);
+    const extra = getHigherQuestion(level);
+    const combined = extra ? [...own, extra] : own.slice(0, 9);
+    return shuffle(combined).slice(0, 9);
+  }
+
+  let userLevel = localStorage.getItem('userLevel') || null;
+  let completedLessons = JSON.parse(localStorage.getItem('completedLessons') || '[]');
+  function saveState(){
+    if (userLevel) localStorage.setItem('userLevel', userLevel);
+    localStorage.setItem('completedLessons', JSON.stringify(completedLessons));
+  }
+
+  function getNodeState(idx){
+    if (completedLessons.includes(idx)) return 'completed';
+    for (let i = 0; i < idx; i++) {
+      if (!completedLessons.includes(i)) return 'locked';
+    }
+    return 'current';
+  }
+
+  function renderPath(){
+    const pathEl = document.getElementById('path');
+    pathEl.innerHTML = '';
+    const totalNodes = 7;
+
+    for (let i = 0; i < totalNodes; i++) {
+      const state = getNodeState(i);
+      const node = document.createElement('div');
+      node.className = 'node ' + state;
+      node.dataset.state = state;
+      node.dataset.idx = i;
+
+      let title = '';
+      if (i === 0) title = 'Тест на уровень';
+      else if (userLevel) title = 'Урок ' + i + ': ' + LESSON_META[userLevel][i-1].name;
+      else title = 'Урок ' + i;
+      node.title = title;
+
+      if (state === 'completed') node.innerHTML = CHECK_SVG;
+      else if (state === 'locked') node.innerHTML = LOCK_SVG;
+      else {
+        if (i === 0) node.innerHTML = TEST_SVG;
+        else node.innerHTML = STAR_SVG;
+      }
+
+      node.addEventListener('click', () => onNodeClick(i, state));
+      pathEl.appendChild(node);
+    }
+
+    const badge = document.getElementById('level-badge');
+    if (userLevel) { badge.style.display = 'inline-block'; badge.textContent = userLevel; }
+    else badge.style.display = 'none';
+  }
+
+  const lessonIntroEl   = document.getElementById('lesson-intro');
+  const testScreenEl    = document.getElementById('test-screen');
+  const resultScreenEl  = document.getElementById('result-screen');
+  const testQuestionEl  = document.getElementById('test-question');
+  const testAnswerArea  = document.getElementById('test-answer-area');
+  const testFeedbackEl  = document.getElementById('test-feedback');
+  const testCounterEl   = document.getElementById('test-counter');
+  const testProgressEl  = document.getElementById('test-progress-fill');
+  const testNextBtn     = document.getElementById('test-next-btn');
+  const testTitleEl     = document.getElementById('test-title');
+
+  function openOverlay(el){ el.classList.add('show'); }
+  function closeOverlay(el){ el.classList.remove('show'); }
+
+  function normalize(s){
+    return s.toLowerCase().trim().replace(/[.,!?;:]+$/g,'').replace(/\s+/g,' ');
+  }
+
+  let currentMode = 'test';
+  let currentLessonIdx = 0;
+  let currentQuestions = [];
+  let state = { index: 0, correct: 0, answered: false };
+
+  function onNodeClick(idx, nodeState){
+    if (nodeState === 'locked') { showToast('Сначала пройдите предыдущие уроки'); return; }
+    if (nodeState === 'completed') { showToast('Урок уже пройден ✓'); return; }
+    if (idx === 0) openLessonIntroForTest();
+    else openLessonIntroForLesson(idx);
+  }
+
+  function openLessonIntroForTest(){
+    document.getElementById('lesson-badge').textContent = 'Урок 1';
+    document.getElementById('lesson-title').textContent = 'Определяем твой уровень';
+    document.getElementById('lesson-desc').textContent = 'Ответь на 22 вопроса — и мы подберём подходящий уровень английского.';
+    document.getElementById('lesson-count').textContent = '22 вопроса';
+    currentMode = 'test';
+    openOverlay(lessonIntroEl);
+  }
+
+  function openLessonIntroForLesson(idx){
+    if (!userLevel) { showToast('Сначала пройдите тест на уровень'); return; }
+    const meta = LESSON_META[userLevel][idx-1];
+    document.getElementById('lesson-badge').textContent = userLevel + ' · Урок ' + idx;
+    document.getElementById('lesson-title').textContent = meta.name;
+    document.getElementById('lesson-desc').textContent = meta.desc;
+    document.getElementById('lesson-count').textContent = '9 вопросов';
+    currentMode = 'lesson';
+    currentLessonIdx = idx;
+    openOverlay(lessonIntroEl);
+  }
+
+  function beginTest(){
+    closeOverlay(lessonIntroEl);
+    currentQuestions = LEVEL_TEST;
+    testTitleEl.textContent = 'Тест на уровень';
+    state = { index: 0, correct: 0, answered: false };
+    renderQuestion();
+    openOverlay(testScreenEl);
+  }
+
+  function beginLesson(){
+    closeOverlay(lessonIntroEl);
+    currentQuestions = buildLesson(userLevel, currentLessonIdx);
+    const meta = LESSON_META[userLevel][currentLessonIdx-1];
+    testTitleEl.textContent = userLevel + ' · ' + meta.name;
+    state = { index: 0, correct: 0, answered: false };
+    renderQuestion();
+    openOverlay(testScreenEl);
+  }
+
+  function renderQuestion(){
+    const q = currentQuestions[state.index];
+    state.answered = false;
+    testFeedbackEl.className = 'test-feedback';
+    testFeedbackEl.innerHTML = '';
+    testNextBtn.style.display = 'none';
+    testCounterEl.textContent = (state.index + 1) + ' / ' + currentQuestions.length;
+    testProgressEl.style.width = ((state.index / currentQuestions.length) * 100) + '%';
+    testQuestionEl.textContent = q.q;
+    testAnswerArea.innerHTML = '';
+
+    if (q.o) {
+      const wrap = document.createElement('div');
+      wrap.className = 'test-options';
+      q.o.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'test-option';
+        btn.textContent = String.fromCharCode(65 + i) + ') ' + opt;
+        btn.addEventListener('click', () => handleChoice(i, btn));
+        wrap.appendChild(btn);
+      });
+      testAnswerArea.appendChild(wrap);
+    } else {
+      const row = document.createElement('div');
+      row.className = 'test-input-row';
+      const input = document.createElement('input');
+      input.className = 'test-input';
+      input.type = 'text';
+      // FIX: нейтральный плейсхолдер, чтобы не подсказывать ответ
+      input.placeholder = 'Введи ответ...';
+      input.autocomplete = 'off';
+      input.autocapitalize = 'off';
+      input.spellcheck = false;
+      row.appendChild(input);
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'button';
+      submitBtn.className = 'test-btn-next';
+      submitBtn.textContent = 'Проверить';
+      submitBtn.addEventListener('click', () => handleInput(input, submitBtn));
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') handleInput(input, submitBtn); });
+      row.appendChild(submitBtn);
+      testAnswerArea.appendChild(row);
+      setTimeout(() => input.focus(), 120);
+    }
+  }
+
+  function handleChoice(idx, btnEl){
+    if (state.answered) return;
+    state.answered = true;
+    const q = currentQuestions[state.index];
+    const isCorrect = idx === q.a;
+    const all = testAnswerArea.querySelectorAll('.test-option');
+    all.forEach(b => b.disabled = true);
+
+    if (isCorrect) {
+      state.correct++;
+      btnEl.classList.add('selected-correct');
+      showCorrectFeedback();
+    } else {
+      btnEl.classList.add('selected-wrong');
+      all[q.a].classList.add('show-correct');
+      showWrongFeedback(q.e);
+    }
+  }
+
+  function handleInput(input, submitBtn){
+    if (state.answered) return;
+    const value = input.value;
+    if (!value.trim()) { input.focus(); return; }
+    state.answered = true;
+    const q = currentQuestions[state.index];
+    const norm = normalize(value);
+    const isCorrect = q.ans.some(a => normalize(a) === norm);
+    input.disabled = true;
+    if (submitBtn) submitBtn.style.display = 'none';
+
+    if (isCorrect) {
+      state.correct++;
+      input.classList.add('correct');
+      showCorrectFeedback();
+    } else {
+      input.classList.add('wrong');
+      showWrongFeedback(q.e);
+    }
+  }
+
+  function showCorrectFeedback(){
+    testFeedbackEl.className = 'test-feedback show correct';
+    testFeedbackEl.innerHTML = '<span class="test-feedback-title">✓ Верно!</span>';
+    setTimeout(nextQuestion, 900);
+  }
+
+  function showWrongFeedback(explanation){
+    testFeedbackEl.className = 'test-feedback show wrong';
+    testFeedbackEl.innerHTML = '<span class="test-feedback-title">✗ Неверно</span>' + (explanation || '');
+    testNextBtn.style.display = 'block';
+    testNextBtn.textContent = state.index === currentQuestions.length - 1 ? 'Показать результат' : 'Дальше';
+  }
+
+  function nextQuestion(){
+    if (state.index >= currentQuestions.length - 1) { finishCurrent(); return; }
+    state.index++;
+    renderQuestion();
+  }
+
+  function finishCurrent(){
+    if (currentMode === 'test') finishTest();
+    else finishLesson();
+  }
+
+  // FIX: теперь после прохождения теста узел 0 становится completed
+  // и путь перерисовывается — урок 1 разблокируется
+  function finishTest(){
+    const score = state.correct;
+    let level, desc;
+    if (score <= 5) { level = 'A1'; desc = 'Beginner. Ты только начинаешь — старт с базовых фраз и простой грамматики.'; }
+    else if (score <= 10) { level = 'A2'; desc = 'Elementary. Ты знаешь основы и можешь объясниться в простых ситуациях.'; }
+    else if (score <= 16) { level = 'B1'; desc = 'Intermediate. Ты уверенно общаешься на бытовые темы и понимаешь знакомые тексты.'; }
+    else { level = 'B2'; desc = 'Upper-Intermediate. Можешь обсуждать сложные темы и понимать нюансы.'; }
+
+    userLevel = level;
+    // FIX: отмечаем тест как пройденный
+    if (!completedLessons.includes(0)) completedLessons.push(0);
+    saveState();
+    // FIX: перерисовываем путь, чтобы узел 0 стал "completed", а урок 1 — "current"
+    renderPath();
+
+    closeOverlay(testScreenEl);
+    document.getElementById('result-emoji').textContent = '🎉';
+    document.getElementById('result-h2').textContent = 'Твой уровень';
+    document.getElementById('result-level').textContent = level;
+    document.getElementById('result-desc').textContent = desc;
+    document.getElementById('result-score').textContent = 'Правильных ответов: ' + score + ' из ' + LEVEL_TEST.length;
+    document.getElementById('result-extra').style.display = 'none';
+    document.getElementById('finish-test-btn').textContent = 'Начать учиться';
+    openOverlay(resultScreenEl);
+  }
+
+  function finishLesson(){
+    const score = state.correct;
+    closeOverlay(testScreenEl);
+    const total = currentQuestions.length;
+    const passed = score >= Math.ceil(total * 0.6);
+
+    if (passed) {
+      if (!completedLessons.includes(currentLessonIdx)) completedLessons.push(currentLessonIdx);
+      saveState();
+      renderPath();
+      const xp = document.getElementById('xp-current');
+      const cur = parseInt(xp.textContent) || 0;
+      const newXp = Math.min(50, cur + 10);
+      xp.textContent = newXp;
+      document.getElementById('daily-fill').style.width = (newXp/50*100) + '%';
+      const gems = document.getElementById('gems-num');
+      const g = parseInt(gems.textContent) || 0;
+      gems.textContent = g + 15;
+
+      document.getElementById('result-emoji').textContent = '✨';
+      document.getElementById('result-h2').textContent = 'Урок пройден';
+      document.getElementById('result-level').textContent = '+1';
+      document.getElementById('result-desc').textContent = 'Отлично! Ты справился с уроком «' + LESSON_META[userLevel][currentLessonIdx-1].name + '».';
+      document.getElementById('result-score').textContent = 'Правильных: ' + score + ' из ' + total;
+      document.getElementById('result-extra').style.display = 'block';
+      document.getElementById('result-extra').textContent = '+10 XP · +15 💎';
+      document.getElementById('finish-test-btn').textContent = 'Продолжить';
+    } else {
+      document.getElementById('result-emoji').textContent = '😔';
+      document.getElementById('result-h2').textContent = 'Нужно повторить';
+      document.getElementById('result-level').textContent = '↻';
+      document.getElementById('result-desc').textContent = 'Правильных ' + score + ' из ' + total + '. Нужно минимум ' + Math.ceil(total*0.6) + '. Попробуй ещё раз!';
+      document.getElementById('result-score').textContent = 'Правильных: ' + score + ' из ' + total;
+      document.getElementById('result-extra').style.display = 'none';
+      document.getElementById('finish-test-btn').textContent = 'Попробовать снова';
+    }
+    openOverlay(resultScreenEl);
+  }
+
+  document.getElementById('begin-test-btn').addEventListener('click', () => {
+    if (currentMode === 'test') beginTest();
+    else beginLesson();
+  });
+  document.getElementById('cancel-lesson-btn').addEventListener('click', () => closeOverlay(lessonIntroEl));
+  testNextBtn.addEventListener('click', nextQuestion);
+  document.getElementById('finish-test-btn').addEventListener('click', () => {
+    closeOverlay(resultScreenEl);
+    if (currentMode === 'lesson') {
+      const res = document.getElementById('result-level').textContent;
+      if (res === '↻') { openLessonIntroForLesson(currentLessonIdx); }
+    }
+  });
+
+  document.getElementById('avatar-btn').addEventListener('click', () => {
+    if (confirm('Сбросить весь прогресс и начать заново?')) {
+      localStorage.clear();
+      location.reload();
+    }
+  });
+
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const label = btn.querySelector('span').textContent;
+      if (label !== 'Учить') showToast('Раздел «' + label + '» скоро');
+    });
+  });
+
+  renderPath();
+
+  /* ---------- Кристалл ---------- */
+  (function () {
+    const cv = document.getElementById('gem-canvas'); if (!cv) return;
+    const ctx = cv.getContext('2d');
+    const W = 26, H = 30, DPR = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = W * DPR; cv.height = H * DPR; ctx.scale(DPR, DPR);
+    const cx = W/2, cy = H/2;
+    const N = 6, RA = 1.00, RB = 0.86, YT = 2.25, YA = 0.50, YB = -0.50, YBO = -2.15;
+    const ringA = [], ringB = [];
+    for (let i = 0; i < N; i++){ const a = (i+0.5)*(Math.PI*2/N); ringA.push({x:Math.cos(a)*RA,y:YA,z:Math.sin(a)*RA}); ringB.push({x:Math.cos(a)*RB,y:YB,z:Math.sin(a)*RB}); }
+    const vTop = {x:0,y:YT,z:0}, vBot = {x:0,y:YBO,z:0};
+    const faces = [];
+    for (let i = 0; i < N; i++){ const j = (i+1)%N; faces.push({v:[vTop,ringA[i],ringA[j]],hue:192}); faces.push({v:[ringA[i],ringB[i],ringB[j],ringA[j]],hue:205}); faces.push({v:[vBot,ringB[j],ringB[i]],hue:216}); }
+    const CAM = 7.5, FOC = 44, LX = -0.45, LY = 0.82, LZ = -0.55, TAU = Math.PI*2;
+    function frame(now){
+      const t = now*0.001, angY = t*1.1, tiltX = 0.34 + Math.sin(t*0.7)*0.06;
+      ctx.clearRect(0,0,W,H);
+      const gl = ctx.createRadialGradient(cx,cy,0,cx,cy,18);
+      gl.addColorStop(0,'rgba(90,200,255,0.25)'); gl.addColorStop(0.5,'rgba(70,140,255,0.10)'); gl.addColorStop(1,'rgba(40,80,255,0)');
+      ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(cx,cy,18,0,TAU); ctx.fill();
+      const cX = Math.cos(tiltX), sX = Math.sin(tiltX), cY = Math.cos(angY), sY = Math.sin(angY);
+      function tr(p){ const y1 = p.y*cX - p.z*sX, z1 = p.y*sX + p.z*cX; return {x:p.x*cY + z1*sY, y:y1, z:-p.x*sY + z1*cY}; }
+      function proj(p){ const s = FOC/(p.z + CAM); return {x:cx + p.x*s, y:cy - p.y*s}; }
+      const tf = faces.map(f => {
+        const vs = f.v.map(tr);
+        const ax = vs[1].x-vs[0].x, ay = vs[1].y-vs[0].y, az = vs[1].z-vs[0].z;
+        const bx = vs[2].x-vs[0].x, by = vs[2].y-vs[0].y, bz = vs[2].z-vs[0].z;
+        let nx = ay*bz - az*by, ny = az*bx - ax*bz, nz = ax*by - ay*bx;
+        const nl = Math.hypot(nx,ny,nz)||1; nx/=nl; ny/=nl; nz/=nl;
+        let cxg = 0, cyg = 0, czg = 0;
+        for (const v of vs){ cxg+=v.x; cyg+=v.y; czg+=v.z; }
+        cxg/=vs.length; cyg/=vs.length; czg/=vs.length;
+        if (nx*cxg + ny*cyg + nz*czg < 0){ nx=-nx; ny=-ny; nz=-nz; }
+        return {hue:f.hue, vs, nx, ny, nz, depth:czg};
+      });
+      tf.sort((a,b)=>b.depth - a.depth);
+      for (const f of tf){
+        const diff = Math.max(0, f.nx*LX + f.ny*LY + f.nz*LZ);
+        const spec = Math.pow(diff, 18);
+        let light = 16 + 58*diff + 50*spec; if (light > 92) light = 92;
+        ctx.beginPath();
+        const p0 = proj(f.vs[0]); ctx.moveTo(p0.x, p0.y);
+        for (let i = 1; i < f.vs.length; i++){ const p = proj(f.vs[i]); ctx.lineTo(p.x, p.y); }
+        ctx.closePath();
+        ctx.fillStyle = `hsla(${f.hue},82%,${light}%,0.93)`; ctx.fill();
+        ctx.lineWidth = 0.6; ctx.strokeStyle = `rgba(190,235,255,${0.18+0.45*diff})`; ctx.stroke();
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+
+  /* ---------- Бесконечность ---------- */
+  (function () {
+    const cv = document.getElementById('life-canvas'); if (!cv) return;
+    const ctx = cv.getContext('2d');
+    const W = 39, H = 26, DPR = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = W * DPR; cv.height = H * DPR; ctx.scale(DPR, DPR);
+    const CX = W/2, CY = H/2, A = 12, YM = 1.40, TAU = Math.PI*2;
+    function point(t){ const s = Math.sin(t), c = Math.cos(t), den = 1+s*s; return {x:CX + A*c/den, y:CY - A*YM*(s*c)/den}; }
+    const SEG = 200, TWIST = 3, HALF = 2.2, SPEED = 1.9;
+    function frame(now){
+      const time = now*0.001;
+      ctx.clearRect(0,0,W,H); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      const pts = [], nrm = [], hw = [], phi = [];
+      for (let i = 0; i <= SEG; i++){
+        const t = i/SEG*TAU, p = point(t);
+        const e = 0.0008, p1 = point(t+e), p0 = point(t-e);
+        let tx = p1.x - p0.x, ty = p1.y - p0.y; const L = Math.hypot(tx,ty)||1; tx/=L; ty/=L;
+        pts.push(p); nrm.push({x:-ty, y:tx});
+        const ph = TWIST*t + time*SPEED; phi.push(ph); hw.push(HALF*Math.cos(ph));
+      }
+      for (let i = 0; i < SEG; i++){
+        const a = pts[i], b = pts[i+1], na = nrm[i], nb = nrm[i+1], ha = hw[i], hb = hw[i+1];
+        const t = i/SEG;
+        const hue = 265 + 70*Math.sin(t*TAU - Math.PI/2);
+        const face = Math.abs(Math.cos(phi[i]));
+        const light = 28 + 46*face;
+        ctx.beginPath();
+        ctx.moveTo(a.x + na.x*ha, a.y + na.y*ha); ctx.lineTo(b.x + nb.x*hb, b.y + nb.y*hb);
+        ctx.lineTo(b.x - nb.x*hb, b.y - nb.y*hb); ctx.lineTo(a.x - na.x*ha, a.y - na.y*ha); ctx.closePath();
+        const fill = `hsl(${hue.toFixed(1)},90%,${light.toFixed(1)}%)`;
+        ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 0.6; ctx.strokeStyle = fill; ctx.stroke();
+        const hl = 0.42;
+        ctx.beginPath();
+        ctx.moveTo(a.x + na.x*ha*hl, a.y + na.y*ha*hl); ctx.lineTo(b.x + nb.x*hb*hl, b.y + nb.y*hb*hl);
+        ctx.lineTo(b.x - nb.x*hb*hl, b.y - nb.y*hb*hl); ctx.lineTo(a.x - na.x*ha*hl, a.y - na.y*ha*hl); ctx.closePath();
+        ctx.fillStyle = `hsla(${hue.toFixed(1)},100%,88%,${0.16 + 0.22*face})`; ctx.fill();
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+</script>
+</body>
+</html>
