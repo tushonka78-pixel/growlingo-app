@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grownilgo</title>
+    <!-- Официальный скрипт Telegram для Mini Apps -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f9ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1 { color: #333; }
+        
+        /* Контейнер дерева */
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.5s ease;
+            padding: 20px 0;
+        }
+        .tree-trunk {
+            position: relative;
+            width: 20px;
+            height: 150px;
+            background: #8B5A2B;
+            border-radius: 10px;
+            transition: all 0.5s ease;
+        }
+        .branch {
+            position: absolute;
+            width: 60px;
+            height: 4px;
+            background: #8B5A2B;
+            border-radius: 2px;
+            transition: all 0.5s ease;
+        }
+        .branch-left {
+            top: 40px;
+            left: -50px;
+            transform: rotate(-30deg);
+            transform-origin: right center;
+        }
+        .branch-right {
+            top: 70px;
+            right: -50px;
+            transform: rotate(30deg);
+            transform-origin: left center;
+        }
+        .leaf {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: #4CAF50;
+            border-radius: 50% 0 50% 50%;
+            transition: all 1s ease;
+        }
+        .branch-left .leaf-1 { top: -15px; left: 0; }
+        .branch-left .leaf-2 { top: -5px; left: 15px; }
+        .branch-right .leaf-3 { top: -15px; right: 0; }
+        .branch-right .leaf-4 { top: -5px; right: 15px; }
+
+        /* Состояние увядания */
+        .withered .leaf {
+            background: #A0522D;
+            transform: scale(0.5) rotate(90deg);
+            opacity: 0.3;
+        }
+        .withered .branch-left {
+            transform: rotate(-50deg);
+            opacity: 0.6;
+        }
+        .withered .branch-right {
+            transform: rotate(50deg);
+            opacity: 0.6;
+        }
+
+        .withered-message {
+            margin-top: 20px;
+            color: #FFA500;
+            font-weight: bold;
+            text-align: center;
+            display: none; /* Скрыто по умолчанию */
+        }
+        .withered .withered-message {
+            display: block;
+            animation: pulse 2s infinite;
+        }
+
+        /* Кнопка */
+        button {
+            margin-top: 30px;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:active { transform: scale(0.95); }
+
+        /* Анимация покачивания живого дерева */
+        .alive .branch-left { animation: sway 3s ease-in-out infinite alternate; }
+        .alive .branch-right { animation: sway 3s ease-in-out infinite alternate-reverse; }
+        @keyframes sway {
+            from { transform: rotate(-30deg); }
+            to { transform: rotate(-25deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Grownilgo 🌳</h1>
+
+    <!-- Наше дерево (класс "alive" ставим по умолчанию) -->
+    <div class="tree-container alive" id="treeContainer">
+        <div class="tree-trunk">
+            <div class="branch branch-left">
+                <div class="leaf leaf-1"></div>
+                <div class="leaf leaf-2"></div>
+                <div class="leaf leaf-3"></div>
+            </div>
+            <div class="branch branch-right">
+                <div class="leaf leaf-4"></div>
+                <div class="leaf leaf-5"></div>
+            </div>
+        </div>
+        <p class="withered-message">Ветки засохли... Вернись и оживи дерево знаниями! 🌱</p>
+    </div>
+
+    <button id="actionBtn">Проверить, как сохнет</button>
+
+    <script>
+        // 1. Инициализация Telegram Mini App
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand(); // Разворачиваем на весь экран
+        }
+
+        // 2. Логика работы кнопки и дерева
+        const treeContainer = document.getElementById('treeContainer');
+        const actionBtn = document.getElementById('actionBtn');
+
+        actionBtn.addEventListener('click', () => {
+            // Если дерево живое - делаем его сухим
+            if (treeContainer.classList.contains('alive')) {
+                treeContainer.classList.remove('alive');
+                treeContainer.classList.add('withered');
+                actionBtn.textContent = 'Оживить дерево';
+            } 
+            // Если сухое - возвращаем к жизни
+            else {
+                treeContainer.classList.remove('withered');
+                treeContainer.classList.add('alive');
+                actionBtn.textContent = 'Проверить, как сохнет';
+            }
+        });
+    </script>
+</body>
+</html>
