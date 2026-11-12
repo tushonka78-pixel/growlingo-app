@@ -2,60 +2,46 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Grownilgo - Day 1</title>
+<title>Grownilgo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  :root{
-    --key: transparent;
-  }
+  :root{ --key: transparent; }
 
   *{ box-sizing: border-box; }
   html, body{
-    margin: 0;
-    height: 100%;
-    /* Наш фон неба для Telegram */
+    margin: 0; height: 100%;
     background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
-    display: grid;
-    place-items: center;
+    display: grid; place-items: center;
     font-family: sans-serif;
     overflow: hidden;
   }
 
-  /* Обертка для плавного скрытия всего экрана онбординга */
-  #intro-wrapper {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  /* ============ ОБЁРТКА ОНБОРДИНГА ============ */
+  #intro-wrapper{
+    position: absolute; inset: 0;
     display: flex; justify-content: center; align-items: center;
-    transition: opacity 0.6s ease;
+    transition: opacity .55s ease, transform .55s ease;
     z-index: 10;
   }
-  #intro-wrapper.hidden {
-    opacity: 0; pointer-events: none;
+  #intro-wrapper.hidden{
+    opacity: 0; pointer-events: none; transform: scale(.94);
   }
 
-  /* --- ОРИГИНАЛЬНЫЙ КОД ИИ (без изменений) --- */
+  /* ==================== АНИМАЦИЯ ==================== */
   .stage{
     position: relative;
-    width: 420px;
-    height: 620px;
-    background: var(--key);
-    overflow: hidden;
+    width: 420px; height: 620px;
+    background: var(--key); overflow: hidden;
   }
-
-  .scene{
-    position: absolute;
-    left: 0; right: 0; top: 0; bottom: 60px;
-  }
+  .scene{ position: absolute; left: 0; right: 0; top: 0; bottom: 60px; }
 
   .shadow{
-    position: absolute;
-    left: 50%; bottom: 70px;
-    width: 180px; height: 28px;
-    margin-left: -90px;
+    position: absolute; left: 50%; bottom: 70px;
+    width: 180px; height: 28px; margin-left: -90px;
     border-radius: 50%;
     background: radial-gradient(ellipse at center, rgba(0,0,0,.42) 0%, rgba(0,0,0,.20) 45%, rgba(0,0,0,0) 72%);
-    transform-origin: center;
-    animation: shadowIn 5s 1 forwards;
+    transform-origin: center; animation: shadowIn 5s 1 forwards;
   }
   @keyframes shadowIn{
     0%, 10%   { opacity: 0; transform: scale(.35); }
@@ -64,12 +50,9 @@
   }
 
   .pot-wrap{
-    position: absolute;
-    left: 50%; bottom: 80px;
-    width: 140px; height: 110px;
-    margin-left: -70px;
-    transform-origin: 50% 100%;
-    animation: potDrop 5s 1 forwards;
+    position: absolute; left: 50%; bottom: 80px;
+    width: 140px; height: 110px; margin-left: -70px;
+    transform-origin: 50% 100%; animation: potDrop 5s 1 forwards;
   }
   @keyframes potDrop{
     0%    { transform: translateY(-720px) rotate(-16deg); animation-timing-function: cubic-bezier(.5,0,.9,.5); }
@@ -118,9 +101,7 @@
     background: radial-gradient(circle at 30% 46%, rgba(255,220,170,.16) 0 1.4px, transparent 1.9px), radial-gradient(circle at 55% 30%, rgba(0,0,0,.30) 0 1.8px, transparent 2.3px), radial-gradient(circle at 73% 62%, rgba(255,220,170,.12) 0 1.2px, transparent 1.7px), radial-gradient(circle at 42% 70%, rgba(0,0,0,.26) 0 1.6px, transparent 2.1px), radial-gradient(circle at 62% 52%, rgba(255,220,170,.10) 0 1.1px, transparent 1.5px);
   }
 
-  .dust i{
-    position: absolute; left: 50%; bottom: 84px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: #8a5a26; opacity: 0; animation: puff 5s 1 forwards;
-  }
+  .dust i{ position: absolute; left: 50%; bottom: 84px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: #8a5a26; opacity: 0; animation: puff 5s 1 forwards; }
   .dust i:nth-child(1){ --dx:-80px; --dy:-36px; width: 9px; height: 9px; }
   .dust i:nth-child(2){ --dx: 74px; --dy:-30px; }
   .dust i:nth-child(3){ --dx:-54px; --dy:-56px; width: 6px; height: 6px; }
@@ -140,9 +121,7 @@
     box-shadow: inset -2px -2px 3px rgba(0,0,0,.42), inset 2px 2px 3px rgba(255,255,255,.55), 0 1px 2px rgba(0,0,0,.3);
     opacity: 0; animation: seedFall 5s 1 forwards;
   }
-  .seed::after{
-    content: ""; position: absolute; left: 4px; top: 3px; width: 5px; height: 2.5px; border-radius: 50%; background: rgba(255,255,255,.75); transform: rotate(-20deg);
-  }
+  .seed::after{ content: ""; position: absolute; left: 4px; top: 3px; width: 5px; height: 2.5px; border-radius: 50%; background: rgba(255,255,255,.75); transform: rotate(-20deg); }
   @keyframes seedFall{
     0%, 20%   { opacity: 0; transform: translateY(-430px) rotate(0deg); }
     21%       { opacity: 1; transform: translateY(-430px) rotate(0deg); animation-timing-function: cubic-bezier(.45,0,.85,.6); }
@@ -152,27 +131,11 @@
     42%, 100% { opacity: 0; transform: translateY(12px) rotate(315deg) scale(.9); }
   }
 
-  .sprout-svg{
-    position: absolute; left: 50%; bottom: 184px; width: 140px; height: 200px; margin-left: -70px; overflow: visible; z-index: 30;
-  }
-  .sprout-sway{
-    transform-box: view-box; transform-origin: 70px 196px; animation: swayGrow 5s 1 forwards;
-  }
-  @keyframes swayGrow{
-    0%, 76%  { transform: rotate(0deg); }
-    84%      { transform: rotate(-2.3deg); }
-    91%      { transform: rotate(1.7deg); }
-    96%      { transform: rotate(-.7deg); }
-    100%     { transform: rotate(0deg); }
-  }
-  .sprout-idle{
-    transform-box: view-box; transform-origin: 70px 196px; animation: swayIdle 2.8s ease-in-out 5s infinite;
-  }
-  @keyframes swayIdle{
-    0%   { transform: rotate(-1.7deg); }
-    50%  { transform: rotate(1.7deg); }
-    100% { transform: rotate(-1.7deg); }
-  }
+  .sprout-svg{ position: absolute; left: 50%; bottom: 184px; width: 140px; height: 200px; margin-left: -70px; overflow: visible; z-index: 30; }
+  .sprout-sway{ transform-box: view-box; transform-origin: 70px 196px; animation: swayGrow 5s 1 forwards; }
+  @keyframes swayGrow{ 0%, 76% { transform: rotate(0deg); } 84% { transform: rotate(-2.3deg); } 91% { transform: rotate(1.7deg); } 96% { transform: rotate(-.7deg); } 100% { transform: rotate(0deg); } }
+  .sprout-idle{ transform-box: view-box; transform-origin: 70px 196px; animation: swayIdle 2.8s ease-in-out 5s infinite; }
+  @keyframes swayIdle{ 0% { transform: rotate(-1.7deg); } 50% { transform: rotate(1.7deg); } 100% { transform: rotate(-1.7deg); } }
   .stem-path, .stem-hi{ stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawStem 5s 1 forwards; }
   @keyframes drawStem{ 0%, 44% { stroke-dashoffset: 100; } 66%, 100% { stroke-dashoffset: 0; } }
   .stem-node{ opacity: 0; animation: nodeIn 5s 1 forwards; }
@@ -184,74 +147,102 @@
   .leaf-bud{ transform-box: fill-box; transform-origin: 50% 100%; animation: leafB 5s 1 forwards; }
   @keyframes leafB{ 0%, 67% { opacity: 0; transform: scale(.04) rotate(8deg); } 74% { opacity: 1; transform: scale(1.16) rotate(-2deg); } 78%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
 
-  /* Оригинальный текст и кнопка от ИИ */
-  .caption{
-    position: absolute;
-    left: 0; right: 0; bottom: 16px;
-    text-align: center;
-    opacity: 0;
-    animation: capIn .9s cubic-bezier(.22,.9,.3,1) 5.2s 1 forwards;
-  }
-  @keyframes capIn{
-    from{ opacity: 0; transform: translateY(16px) scale(.96); }
-    to  { opacity: 1; transform: translateY(0) scale(1); }
-  }
-  .day{
-    font: 800 46px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    color: #fff;
-    letter-spacing: .5px;
-    text-shadow: 0 3px 12px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.45);
-  }
-  .cta{
-    display: inline-block; margin-top: 12px; padding: 11px 26px;
-    border: 0; border-radius: 999px;
-    font: 600 16px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    color: #f2fff2; background: linear-gradient(180deg, #2c9a2c, #145214);
-    box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.25);
-    cursor: pointer; transition: transform .18s ease, box-shadow .18s ease;
-  }
+  .caption{ position: absolute; left: 0; right: 0; bottom: 16px; text-align: center; opacity: 0; animation: capIn .9s cubic-bezier(.22,.9,.3,1) 5.2s 1 forwards; }
+  @keyframes capIn{ from{ opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .day{ font: 800 46px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #fff; letter-spacing: .5px; text-shadow: 0 3px 12px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.45); }
+  .cta{ display: inline-block; margin-top: 12px; padding: 11px 26px; border: 0; border-radius: 999px; font: 600 16px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #f2fff2; background: linear-gradient(180deg, #2c9a2c, #145214); box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.25); cursor: pointer; transition: transform .18s ease, box-shadow .18s ease; }
   .cta:hover { transform: translateY(-2px); box-shadow: 0 9px 18px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.3); }
   .cta:active { transform: translateY(0); }
 
-  /* --- ВТОРОЙ ЭКРАН (ДЕРЕВО) --- */
-  #main-screen {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 5;
-  }
-  #main-screen.active { opacity: 1; pointer-events: auto; }
-  #main-screen h1 { font-family: sans-serif; font-size: 34px; font-weight: 900; margin-top: 50px; color: #1e293b; }
-  
-  .tree-scene { position: relative; width: 280px; height: 320px; display: flex; justify-content: center; align-items: flex-end; margin-top: 10px; }
-  .tree-svg { width: 100%; height: 100%; transition: all 0.8s ease; transform-origin: bottom center; }
-  .alive .tree-svg { animation: sway 4s ease-in-out infinite alternate; }
-  @keyframes sway { 0% { transform: rotate(-3deg); } 100% { transform: rotate(3deg); } }
-  .trunk { fill: url(#trunkGradient); transition: fill 0.5s; }
-  .leaf { fill: url(#leafGradient); transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
-  .withered .trunk { fill: #78716c; }
-  .withered .leaf { fill: #a8a29e; transform: translateY(150px) rotate(90deg) scale(0.5); opacity: 0; }
+  /* ============================================================
+     ГЛАВНЫЙ ЭКРАН
+     ============================================================ */
+  #main-screen{ position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, #f5faff 0%, #dbeafe 100%); opacity: 0; pointer-events: none; transition: opacity .55s ease; z-index: 5; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  #main-screen.active{ opacity: 1; pointer-events: auto; }
+  #main-screen::before, #main-screen::after{ content: ""; position: absolute; pointer-events: none; border-radius: 50%; filter: blur(50px); }
+  #main-screen::before{ top: 80px; right: -60px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(147,197,253,.45), transparent 70%); }
+  #main-screen::after{ bottom: 140px; left: -80px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(96,165,250,.28), transparent 70%); }
 
-  .action-btn {
-      width: 85%; max-width: 350px; padding: 18px; margin-top: 30px;
-      font-size: 18px; font-family: sans-serif; font-weight: 900;
-      color: white; background-color: #58cc02;
-      border: none; border-radius: 16px;
-      box-shadow: 0 8px 0 #46a302;
-      cursor: pointer; transition: all 0.1s ease;
+  .app-shell{ width: 100%; max-width: 480px; height: 100%; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+  /* ---- ВЕРХНЯЯ ПАНЕЛЬ ---- */
+  .top-bar{ display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top, 12px)); gap: 10px; flex-shrink: 0; }
+  .stats{ display: flex; gap: 6px; flex: 1; min-width: 0; }
+  .stat{ display: flex; align-items: center; gap: 5px; background: #ffffff; height: 52px; padding: 0 12px 0 8px; border-radius: 16px; box-shadow: 0 2px 8px rgba(30,64,175,.08), 0 1px 2px rgba(0,0,0,.03); flex-shrink: 0; }
+  .stat-anim{ display: block; flex-shrink: 0; }
+  .stat-fire .stat-anim{ width: 28px; height: 36px; }
+  .stat-gem .stat-anim{ width: 26px; height: 30px; }
+  .stat-life .stat-anim{ width: 39px; height: 26px; }
+  .stat-num{ font-weight: 800; font-size: 14px; color: #1e40af; line-height: 1; }
+  .avatar-btn{ width: 42px; height: 42px; border-radius: 50%; border: 3px solid #ffffff; background: linear-gradient(135deg, #93c5fd, #3b82f6); color: #fff; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 3px 10px rgba(59,130,246,.35); display: grid; place-items: center; transition: transform .15s ease; flex-shrink: 0; }
+  .avatar-btn:active{ transform: scale(.92); }
+
+  /* КОНТЕНТ */
+  .content{ flex: 1; overflow-y: auto; padding: 4px 18px 110px; -webkit-overflow-scrolling: touch; }
+  .content::-webkit-scrollbar{ width: 0; }
+  .daily-card{ background: #ffffff; border-radius: 18px; padding: 16px 18px; box-shadow: 0 4px 16px rgba(30,64,175,.07), 0 1px 3px rgba(0,0,0,.03); margin-bottom: 22px; }
+  .daily-top{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .daily-title{ font-size: 15px; font-weight: 800; color: #1e293b; }
+  .daily-sub{ font-size: 12px; color: #64748b; margin-top: 3px; font-weight: 500; }
+  .daily-count{ font-size: 13px; color: #64748b; font-weight: 600; white-space: nowrap; }
+  .daily-count strong{ color: #1e40af; font-size: 15px; }
+  .daily-bar{ height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; position: relative; }
+  .daily-fill{ height: 100%; width: 0%; background: linear-gradient(90deg, #60a5fa, #3b82f6); border-radius: 999px; position: relative; transition: width 0.5s ease; }
+  .daily-fill::after{ content: ""; position: absolute; top: 2px; left: 10px; right: 10px; height: 2.5px; background: rgba(255,255,255,.45); border-radius: 999px; }
+
+  .section-header{ margin: 0 4px 12px; }
+  .section-label{ display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 1.4px; color: #2563eb; text-transform: uppercase; background: rgba(59,130,246,.1); padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; }
+  .section-title{ font-size: 22px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: -0.3px; }
+
+  /* УРОКИ (ПУТЬ) */
+  .path{ display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 22px 0 30px; }
+  .node{ width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; font-weight: 900; color: #fff; position: relative; cursor: pointer; transition: transform .15s ease; user-select: none; flex-shrink: 0; }
+  
+  /* Змейка: смещение четных и нечетных узлов */
+  .node:nth-child(odd){ margin-right: 80px; }
+  .node:nth-child(even){ margin-left: 80px; }
+
+  .node:active{ transform: scale(.9); }
+  
+  .node.current{ background: linear-gradient(180deg, #93c5fd, #60a5fa); box-shadow: 0 6px 0 #1e40af, 0 0 0 10px rgba(96,165,250,.22), 0 8px 22px rgba(30,64,175,.3); animation: nodePulse 2.4s ease-in-out infinite; }
+  @keyframes nodePulse{
+    0%, 100% { box-shadow: 0 6px 0 #1e40af, 0 0 0 10px rgba(96,165,250,.22), 0 8px 22px rgba(30,64,175,.3); }
+    50%      { box-shadow: 0 6px 0 #1e40af, 0 0 0 18px rgba(96,165,250,.08), 0 8px 22px rgba(30,64,175,.3); }
   }
-  .action-btn:active { transform: translateY(8px); box-shadow: 0 0px 0 #46a302; }
+  .node.current::before{ content: ""; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 12px solid #1e40af; animation: bounceDown 1.6s ease-in-out infinite; filter: drop-shadow(0 2px 3px rgba(30,64,175,.25)); }
+  @keyframes bounceDown{ 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
+  
+  .node.locked{ background: #e2e8f0; color: #94a3b8; box-shadow: 0 6px 0 #cbd5e1; font-size: 24px; opacity: 0.7; }
+  .node.completed{ background: linear-gradient(180deg, #60a5fa, #3b82f6); box-shadow: 0 6px 0 #1e40af; }
+  
+  /* Метка под первым уроком */
+  .node-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
+  .node-wrapper:nth-child(odd){ margin-right: 80px; }
+  .node-wrapper:nth-child(even){ margin-left: 80px; }
+  .node-wrapper .node { margin: 0; }
+  
+  .node-label { font-size: 13px; font-weight: 800; color: #1e40af; margin-top: 10px; text-align: center; background: white; padding: 4px 10px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); white-space: nowrap; }
+
+  .bottom-nav{ position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(255,255,255,.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -3px 14px rgba(30,64,175,.06); z-index: 3; }
+  .nav-btn{ display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: 0; padding: 6px 4px; color: #94a3b8; font-size: 10px; font-weight: 700; cursor: pointer; transition: color .2s ease, transform .15s ease; }
+  .nav-btn svg{ width: 24px; height: 24px; }
+  .nav-btn.active{ color: #2563eb; }
+  .nav-btn:active{ transform: scale(.94); }
+
+  .toast{ position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: #1e293b; color: #fff; padding: 11px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all .3s ease; z-index: 100; white-space: nowrap; box-shadow: 0 8px 20px rgba(15,23,42,.25); }
+  .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-  <!-- ЭКРАН 1: ОРИГИНАЛЬНЫЙ ОНБОРДИНГ -->
+  <!-- ============ ЭКРАН 1: ОНБОРДИНГ ============ -->
   <div id="intro-wrapper">
     <div class="stage">
       <div class="scene">
         <div class="shadow"></div>
         <div class="pot-wrap">
-          <div class="pot-body"></div><div class="pot-rim"></div><div class="rim-inner"></div><div class="rim-shine"></div><div class="pot-soil"></div>
+          <div class="pot-body"></div><div class="pot-rim"></div>
+          <div class="rim-inner"></div><div class="rim-shine"></div><div class="pot-soil"></div>
         </div>
         <div class="dust"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="seed"></div>
@@ -261,88 +252,16 @@
             <linearGradient id="g-leafL" x1="1" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#2b8f2b"/><stop offset="50%" stop-color="#5dd45d"/><stop offset="100%" stop-color="#b3f8b3"/></linearGradient>
             <linearGradient id="g-leafR" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#2b8f2b"/><stop offset="50%" stop-color="#5dd45d"/><stop offset="100%" stop-color="#b3f8b3"/></linearGradient>
           </defs>
-          <g class="sprout-sway">
-            <g class="sprout-idle">
+          <g class="sprout-sway"><g class="sprout-idle">
               <path class="stem-path" pathLength="100" d="M70,196 C71,172 67,150 69,128 C71,110 66,86 68,60" fill="none" stroke="url(#g-stem)" stroke-width="8" stroke-linecap="round"/>
               <path class="stem-hi" pathLength="100" d="M67.5,196 C68.5,172 64.5,150 66.5,128 C68.5,110 63.5,86 65.5,60" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="2.2" stroke-linecap="round"/>
               <ellipse class="stem-node" cx="69.5" cy="163" rx="5" ry="2.2" fill="#2c8c2c"/>
-              <g class="leaf-left">
-                <path d="M69,128 C54,128 36,118 30,96 C44,90 60,102 69,122 Z" fill="url(#g-leafL)"/>
-                <path d="M68,125 L33,98" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
-                <path d="M56,113 L50,104 M46,105 L39,99 M60,119 L57,111" stroke="#2f8f2f" stroke-width="1" fill="none" opacity=".35" stroke-linecap="round"/>
-              </g>
-              <g class="leaf-right">
-                <path d="M68,96 C82,96 100,86 106,64 C92,58 76,70 68,90 Z" fill="url(#g-leafR)"/>
-                <path d="M69,93 L103,66" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
-                <path d="M82,82 L90,74 M92,76 L99,71 M78,88 L76,80" stroke="#2f8f2f" stroke-width="1" fill="none" opacity=".35" stroke-linecap="round"/>
-              </g>
-              <g class="leaf-bud">
-                <path d="M68,64 C63,56 60,46 62,34 C69,38 73,50 68,60 Z" fill="url(#g-leafR)"/>
-                <path d="M67,60 L64,40" stroke="#3aa33a" stroke-width="1" fill="none" opacity=".45" stroke-linecap="round"/>
-              </g>
-            </g>
-          </g>
+              <g class="leaf-left"><path d="M69,128 C54,128 36,118 30,96 C44,90 60,102 69,122 Z" fill="url(#g-leafL)"/><path d="M68,125 L33,98" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/></g>
+              <g class="leaf-right"><path d="M68,96 C82,96 100,86 106,64 C92,58 76,70 68,90 Z" fill="url(#g-leafR)"/><path d="M69,93 L103,66" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/></g>
+              <g class="leaf-bud"><path d="M68,64 C63,56 60,46 62,34 C69,38 73,50 68,60 Z" fill="url(#g-leafR)"/></g>
+          </g></g>
         </svg>
       </div>
-      <!-- Оригинальный текст -->
       <div class="caption">
         <div class="day">Day 1</div>
-        <div><button type="button" class="cta" id="start-btn">Начать заниматься</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ЭКРАН 2: ДЕРЕВО -->
-  <div id="main-screen">
-    <h1>Grownilgo 🌳</h1>
-    <div class="tree-scene alive" id="treeContainer">
-        <svg class="tree-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="trunkGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#78350f" /><stop offset="50%" stop-color="#b45309" /><stop offset="100%" stop-color="#78350f" /></linearGradient>
-                <radialGradient id="leafGradient" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#86efac" /><stop offset="100%" stop-color="#16a34a" /></radialGradient>
-            </defs>
-            <path class="trunk" d="M90,250 L110,250 L105,130 L95,130 Z" />
-            <path class="trunk" d="M100,160 L60,130 L55,140 L100,170 Z" />
-            <path class="trunk" d="M100,180 L140,140 L145,150 L100,190 Z" />
-            <circle class="leaf" cx="100" cy="100" r="45" /><circle class="leaf" cx="60" cy="120" r="35" /><circle class="leaf" cx="140" cy="120" r="35" />
-            <circle class="leaf" cx="80" cy="70" r="30" /><circle class="leaf" cx="120" cy="70" r="30" />
-            <circle class="leaf" cx="85" cy="85" r="15" opacity="0.6" fill="#bbf7d0" /><circle class="leaf" cx="130" cy="105" r="10" opacity="0.6" fill="#bbf7d0" />
-        </svg>
-    </div>
-    <button class="action-btn" id="actionBtn">Проверить, как сохнет</button>
-  </div>
-
-  <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) { tg.ready(); tg.expand(); }
-
-    // Переход по кнопке
-    document.getElementById('start-btn').addEventListener('click', () => {
-        document.getElementById('intro-wrapper').classList.add('hidden');
-        setTimeout(() => {
-            document.getElementById('main-screen').classList.add('active');
-        }, 400);
-    });
-
-    // Логика увядания дерева
-    const treeContainer = document.getElementById('treeContainer');
-    const actionBtn = document.getElementById('actionBtn');
-
-    actionBtn.addEventListener('click', () => {
-        if (treeContainer.classList.contains('alive')) {
-            treeContainer.classList.remove('alive');
-            treeContainer.classList.add('withered');
-            actionBtn.textContent = 'Оживить дерево';
-            actionBtn.style.backgroundColor = '#3b82f6';
-            actionBtn.style.boxShadow = '0 8px 0 #1e3a8a';
-        } else {
-            treeContainer.classList.remove('withered');
-            treeContainer.classList.add('alive');
-            actionBtn.textContent = 'Проверить, как сохнет';
-            actionBtn.style.backgroundColor = '#58cc02';
-            actionBtn.style.boxShadow = '0 8px 0 #46a302';
-        }
-    });
-  </script>
-</body>
-</html>
+        <div>
