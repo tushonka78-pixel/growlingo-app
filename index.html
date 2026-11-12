@@ -1,288 +1,348 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Grownilgo</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+<meta charset="utf-8">
+<title>Grownilgo - День 1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
 
-        body {
-            margin: 0; padding: 0;
-            font-family: 'Nunito', sans-serif;
-            /* Красивый градиент неба вместо хромакея */
-            background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #1e293b;
-            user-select: none;
-        }
+  *{ box-sizing: border-box; }
+  html, body{
+    margin: 0; padding: 0; height: 100%;
+    /* Наш красивый фон неба вместо хромакея */
+    background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+    display: grid; place-items: center;
+    font-family: 'Nunito', sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
 
-        /* Контейнер для анимации */
-        .stage {
-            position: relative;
-            width: 100vw;
-            height: 60vh; /* Занимает 60% экрана по высоте */
-            max-height: 450px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            margin-bottom: 20px;
-        }
+  /* --- ЭКРАН 1: АНИМАЦИЯ --- */
+  #intro-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.6s ease;
+    z-index: 10;
+  }
+  #intro-screen.hidden {
+    opacity: 0; pointer-events: none;
+  }
 
-        /* --- ВСЯ АНИМАЦИЯ (отредактированная под мобилки) --- */
-        .shadow{
-            position: absolute;
-            left: 50%; bottom: 0px;
-            width: 180px; height: 28px;
-            margin-left: -90px;
-            border-radius: 50%;
-            background: radial-gradient(ellipse at center, rgba(0,0,0,.15) 0%, rgba(0,0,0,.05) 45%, rgba(0,0,0,0) 72%);
-            transform-origin: center;
-            animation: shadowIn 5s infinite;
-        }
-        @keyframes shadowIn{
-            0%, 10%   { opacity: 0; transform: scale(.35); }
-            12%       { opacity: 1; transform: scale(1.06); }
-            15%, 100% { opacity: 1; transform: scale(1); }
-        }
+  .stage{
+    position: relative;
+    width: 100vw; /* Адаптивно под экран */
+    height: 75vh;
+    max-width: 420px;
+    overflow: hidden;
+    display: flex; justify-content: center;
+  }
 
-        .pot-wrap{
-            position: absolute;
-            left: 50%; bottom: 10px;
-            width: 140px; height: 110px;
-            margin-left: -70px;
-            transform-origin: 50% 100%;
-            animation: potDrop 5s infinite;
-        }
-        @keyframes potDrop{
-            0%    { transform: translateY(-720px) rotate(-16deg); animation-timing-function: cubic-bezier(.5,0,.9,.5); }
-            11%   { transform: translateY(0) rotate(0deg); animation-timing-function: ease-out; }
-            13.5% { transform: translateY(5px) scale(1.12,.86); animation-timing-function: ease-out; }
-            16%   { transform: translateY(-9px) scale(.95,1.06); animation-timing-function: ease-in; }
-            18.5% { transform: translateY(2px) scale(1.02,.98); animation-timing-function: ease-out; }
-            21%, 100% { transform: translateY(0) scale(1,1); }
-        }
+  .scene{
+    position: absolute; left: 0; right: 0; top: 0; bottom: 80px;
+  }
 
-        .pot-body{
-            position: absolute; inset: 0;
-            background: linear-gradient(100deg, #5d2c07 0%, #8c4a12 12%, #c47a30 30%, #e2a35e 40%, #cf8b3d 50%, #b06a24 64%, #8a4611 82%, #522605 100%);
-            clip-path: polygon(0% 0%, 100% 0%, 87% 100%, 13% 100%);
-        }
-        .pot-body::before{
-            content: ""; position: absolute; inset: 0;
-            background-image: repeating-linear-gradient(90deg, rgba(55,22,0,.11) 0 1.5px, rgba(255,225,185,.07) 1.5px 3px, transparent 3px 12px), radial-gradient(circle at 24% 34%, rgba(50,20,0,.18) 0 2px, transparent 2.6px), radial-gradient(circle at 62% 58%, rgba(50,20,0,.14) 0 1.7px, transparent 2.2px), radial-gradient(circle at 79% 76%, rgba(255,225,190,.16) 0 1.5px, transparent 2px), radial-gradient(circle at 39% 82%, rgba(50,20,0,.13) 0 1.9px, transparent 2.4px), radial-gradient(circle at 55% 22%, rgba(255,225,190,.12) 0 1.4px, transparent 1.9px);
-        }
-        .pot-body::after{
-            content: ""; position: absolute; top: 0; left: 25%; width: 11%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,.42), rgba(255,255,255,.10) 60%, rgba(255,255,255,.02));
-            filter: blur(.4px);
-        }
-        .pot-rim{
-            position: absolute; top: -16px; left: -6px; width: 152px; height: 34px; border-radius: 50%;
-            background: linear-gradient(to bottom, #f7b671 0%, #e09a4d 30%, #c07a2c 55%, #9a5915 78%, #6d3a08 100%);
-            box-shadow: inset 0 -6px 9px rgba(0,0,0,.38), 0 3px 6px rgba(0,0,0,.28);
-        }
-        .rim-inner{
-            position: absolute; top: -10px; left: 2px; width: 136px; height: 24px; border-radius: 50%;
-            background: radial-gradient(ellipse at 50% 20%, #4a2408 0%, #351806 55%, #241004 100%);
-            box-shadow: inset 0 3px 6px rgba(0,0,0,.85);
-        }
-        .rim-shine{
-            position: absolute; top: 3px; left: 18px; width: 54px; height: 11px; border-radius: 50%;
-            background: radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.62), rgba(255,255,255,0) 70%);
-        }
-        .pot-soil{
-            position: absolute; top: -8px; left: 7px; width: 126px; height: 20px; border-radius: 50%;
-            background: radial-gradient(ellipse at 50% 32%, #7a5227 0%, #4e2f12 52%, #2b1807 100%);
-            box-shadow: inset 0 3px 8px rgba(0,0,0,.75);
-        }
-        .pot-soil::after{
-            content: ""; position: absolute; inset: 0; border-radius: 50%;
-            background: radial-gradient(circle at 30% 46%, rgba(255,220,170,.16) 0 1.4px, transparent 1.9px), radial-gradient(circle at 55% 30%, rgba(0,0,0,.30) 0 1.8px, transparent 2.3px), radial-gradient(circle at 73% 62%, rgba(255,220,170,.12) 0 1.2px, transparent 1.7px), radial-gradient(circle at 42% 70%, rgba(0,0,0,.26) 0 1.6px, transparent 2.1px), radial-gradient(circle at 62% 52%, rgba(255,220,170,.10) 0 1.1px, transparent 1.5px);
-        }
+  /* ================= ТЕНЬ ================= */
+  .shadow{
+    position: absolute; left: 50%; bottom: 70px;
+    width: 180px; height: 28px; margin-left: -90px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,.25) 0%, rgba(0,0,0,.10) 45%, rgba(0,0,0,0) 72%);
+    transform-origin: center;
+    animation: shadowIn 5s 1 forwards;
+  }
+  @keyframes shadowIn{
+    0%, 10%   { opacity: 0; transform: scale(.35); }
+    12%       { opacity: 1; transform: scale(1.06); }
+    15%, 100% { opacity: 1; transform: scale(1); }
+  }
 
-        .dust i{
-            position: absolute; left: 50%; bottom: 14px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: #8a5a26; opacity: 0; animation: puff 5s infinite;
-        }
-        .dust i:nth-child(1){ --dx:-80px; --dy:-36px; width: 9px; height: 9px; }
-        .dust i:nth-child(2){ --dx: 74px; --dy:-30px; }
-        .dust i:nth-child(3){ --dx:-54px; --dy:-56px; width: 6px; height: 6px; }
-        .dust i:nth-child(4){ --dx: 48px; --dy:-58px; width: 8px; height: 8px; }
-        .dust i:nth-child(5){ --dx:-100px; --dy:-14px; width: 5px; height: 5px; }
-        .dust i:nth-child(6){ --dx: 92px; --dy:-16px; width: 6px; height: 6px; }
-        @keyframes puff{
-            0%, 11.4% { opacity: 0; transform: translate(0,0) scale(.4); }
-            12.4%     { opacity: .95; transform: translate(calc(var(--dx)*.12), calc(var(--dy)*.12)) scale(1); }
-            22%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.22); }
-        }
+  /* ================= ГОРШОК ================= */
+  .pot-wrap{
+    position: absolute; left: 50%; bottom: 80px;
+    width: 140px; height: 110px; margin-left: -70px;
+    transform-origin: 50% 100%;
+    animation: potDrop 5s 1 forwards;
+  }
+  @keyframes potDrop{
+    0%    { transform: translateY(-720px) rotate(-16deg); animation-timing-function: cubic-bezier(.5,0,.9,.5); }
+    11%   { transform: translateY(0) rotate(0deg); animation-timing-function: ease-out; }
+    13.5% { transform: translateY(5px) scale(1.12,.86); animation-timing-function: ease-out; }
+    16%   { transform: translateY(-9px) scale(.95,1.06); animation-timing-function: ease-in; }
+    18.5% { transform: translateY(2px) scale(1.02,.98); animation-timing-function: ease-out; }
+    21%, 100% { transform: translateY(0) scale(1,1); }
+  }
 
-        .seed{
-            position: absolute; left: 50%; bottom: 116px; width: 18px; height: 13px; margin-left: -9px; z-index: 20;
-            border-radius: 60% 40% 45% 55% / 70% 65% 35% 30%;
-            background: linear-gradient(150deg, #f2cb8d 0%, #cb9c50 38%, #8d611f 72%, #5b390b 100%);
-            box-shadow: inset -2px -2px 3px rgba(0,0,0,.42), inset 2px 2px 3px rgba(255,255,255,.55), 0 1px 2px rgba(0,0,0,.3);
-            opacity: 0; animation: seedFall 5s infinite;
-        }
-        .seed::after{
-            content: ""; position: absolute; left: 4px; top: 3px; width: 5px; height: 2.5px; border-radius: 50%; background: rgba(255,255,255,.75); transform: rotate(-20deg);
-        }
-        @keyframes seedFall{
-            0%, 20%   { opacity: 0; transform: translateY(-430px) rotate(0deg); }
-            21%       { opacity: 1; transform: translateY(-430px) rotate(0deg); animation-timing-function: cubic-bezier(.45,0,.85,.6); }
-            31%       { opacity: 1; transform: translateY(0) rotate(220deg); animation-timing-function: ease-out; }
-            34%       { opacity: 1; transform: translateY(-14px) rotate(252deg); animation-timing-function: ease-in; }
-            38%       { opacity: 1; transform: translateY(2px) rotate(282deg); }
-            42%, 100% { opacity: 0; transform: translateY(12px) rotate(315deg) scale(.9); }
-        }
+  .pot-body{
+    position: absolute; inset: 0;
+    background: linear-gradient(100deg, #5d2c07 0%, #8c4a12 12%, #c47a30 30%, #e2a35e 40%, #cf8b3d 50%, #b06a24 64%, #8a4611 82%, #522605 100%);
+    clip-path: polygon(0% 0%, 100% 0%, 87% 100%, 13% 100%);
+  }
+  .pot-body::before{
+    content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(90deg, rgba(55,22,0,.11) 0 1.5px, rgba(255,225,185,.07) 1.5px 3px, transparent 3px 12px), radial-gradient(circle at 24% 34%, rgba(50,20,0,.18) 0 2px, transparent 2.6px), radial-gradient(circle at 62% 58%, rgba(50,20,0,.14) 0 1.7px, transparent 2.2px), radial-gradient(circle at 79% 76%, rgba(255,225,190,.16) 0 1.5px, transparent 2px), radial-gradient(circle at 39% 82%, rgba(50,20,0,.13) 0 1.9px, transparent 2.4px), radial-gradient(circle at 55% 22%, rgba(255,225,190,.12) 0 1.4px, transparent 1.9px);
+  }
+  .pot-body::after{
+    content: ""; position: absolute; top: 0; left: 25%; width: 11%; height: 100%;
+    background: linear-gradient(to bottom, rgba(255,255,255,.42), rgba(255,255,255,.10) 60%, rgba(255,255,255,.02));
+    filter: blur(.4px);
+  }
+  .pot-rim{
+    position: absolute; top: -16px; left: -6px; width: 152px; height: 34px; border-radius: 50%;
+    background: linear-gradient(to bottom, #f7b671 0%, #e09a4d 30%, #c07a2c 55%, #9a5915 78%, #6d3a08 100%);
+    box-shadow: inset 0 -6px 9px rgba(0,0,0,.38), 0 3px 6px rgba(0,0,0,.28);
+  }
+  .rim-inner{
+    position: absolute; top: -10px; left: 2px; width: 136px; height: 24px; border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 20%, #4a2408 0%, #351806 55%, #241004 100%);
+    box-shadow: inset 0 3px 6px rgba(0,0,0,.85);
+  }
+  .rim-shine{
+    position: absolute; top: 3px; left: 18px; width: 54px; height: 11px; border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.62), rgba(255,255,255,0) 70%);
+  }
+  .pot-soil{
+    position: absolute; top: -8px; left: 7px; width: 126px; height: 20px; border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 32%, #7a5227 0%, #4e2f12 52%, #2b1807 100%);
+    box-shadow: inset 0 3px 8px rgba(0,0,0,.75);
+  }
+  .pot-soil::after{
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle at 30% 46%, rgba(255,220,170,.16) 0 1.4px, transparent 1.9px), radial-gradient(circle at 55% 30%, rgba(0,0,0,.30) 0 1.8px, transparent 2.3px), radial-gradient(circle at 73% 62%, rgba(255,220,170,.12) 0 1.2px, transparent 1.7px), radial-gradient(circle at 42% 70%, rgba(0,0,0,.26) 0 1.6px, transparent 2.1px), radial-gradient(circle at 62% 52%, rgba(255,220,170,.10) 0 1.1px, transparent 1.5px);
+  }
 
-        .sprout-svg{
-            position: absolute; left: 50%; bottom: 114px; width: 140px; height: 200px; margin-left: -70px; overflow: visible; z-index: 30;
-        }
-        .sprout-sway{ transform-box: view-box; transform-origin: 70px 196px; animation: sway 5s infinite; }
-        @keyframes sway{ 0%, 76% { transform: rotate(0deg); } 84% { transform: rotate(-2.3deg); } 91% { transform: rotate(1.7deg); } 96% { transform: rotate(-.7deg); } 100% { transform: rotate(0deg); } }
-        
-        .stem-path, .stem-hi { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawStem 5s infinite; }
-        @keyframes drawStem{ 0%, 44% { stroke-dashoffset: 100; } 66%, 100% { stroke-dashoffset: 0; } }
-        
-        .stem-node{ opacity: 0; animation: nodeIn 5s infinite; }
-        @keyframes nodeIn{ 0%, 56% { opacity: 0; } 64%, 100% { opacity: .85; } }
-        
-        .leaf-left{ transform-box: fill-box; transform-origin: 100% 100%; animation: leafL 5s infinite; }
-        @keyframes leafL{ 0%, 57% { opacity: 0; transform: scale(.04) rotate(-12deg); } 64% { opacity: 1; transform: scale(1.14) rotate(2deg); } 68%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
-        
-        .leaf-right{ transform-box: fill-box; transform-origin: 0% 100%; animation: leafR 5s infinite; }
-        @keyframes leafR{ 0%, 61% { opacity: 0; transform: scale(.04) rotate(12deg); } 68% { opacity: 1; transform: scale(1.14) rotate(-2deg); } 72%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
-        
-        .leaf-bud{ transform-box: fill-box; transform-origin: 50% 100%; animation: leafB 5s infinite; }
-        @keyframes leafB{ 0%, 67% { opacity: 0; transform: scale(.04) rotate(8deg); } 74% { opacity: 1; transform: scale(1.16) rotate(-2deg); } 78%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+  /* ================= ПЫЛЬ ================= */
+  .dust i{
+    position: absolute; left: 50%; bottom: 84px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: #8a5a26; opacity: 0; animation: puff 5s 1 forwards;
+  }
+  .dust i:nth-child(1){ --dx:-80px; --dy:-36px; width: 9px; height: 9px; }
+  .dust i:nth-child(2){ --dx: 74px; --dy:-30px; }
+  .dust i:nth-child(3){ --dx:-54px; --dy:-56px; width: 6px; height: 6px; }
+  .dust i:nth-child(4){ --dx: 48px; --dy:-58px; width: 8px; height: 8px; }
+  .dust i:nth-child(5){ --dx:-100px; --dy:-14px; width: 5px; height: 5px; }
+  .dust i:nth-child(6){ --dx: 92px; --dy:-16px; width: 6px; height: 6px; }
+  @keyframes puff{
+    0%, 11.4% { opacity: 0; transform: translate(0,0) scale(.4); }
+    12.4%     { opacity: .95; transform: translate(calc(var(--dx)*.12), calc(var(--dy)*.12)) scale(1); }
+    22%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.22); }
+  }
 
-        /* --- UI ЭЛЕМЕНТЫ (Текст и кнопка) --- */
-        .ui-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 0;
-            /* Появляются на 4-й секунде, когда росток уже вырос */
-            animation: fadeInUp 1s 4s forwards;
-            z-index: 10;
-        }
+  /* ================= СЕМЕЧКО ================= */
+  .seed{
+    position: absolute; left: 50%; bottom: 186px; width: 18px; height: 13px; margin-left: -9px; z-index: 20;
+    border-radius: 60% 40% 45% 55% / 70% 65% 35% 30%;
+    background: linear-gradient(150deg, #f2cb8d 0%, #cb9c50 38%, #8d611f 72%, #5b390b 100%);
+    box-shadow: inset -2px -2px 3px rgba(0,0,0,.42), inset 2px 2px 3px rgba(255,255,255,.55), 0 1px 2px rgba(0,0,0,.3);
+    opacity: 0; animation: seedFall 5s 1 forwards;
+  }
+  .seed::after{
+    content: ""; position: absolute; left: 4px; top: 3px; width: 5px; height: 2.5px; border-radius: 50%; background: rgba(255,255,255,.75); transform: rotate(-20deg);
+  }
+  @keyframes seedFall{
+    0%, 20%   { opacity: 0; transform: translateY(-430px) rotate(0deg); }
+    21%       { opacity: 1; transform: translateY(-430px) rotate(0deg); animation-timing-function: cubic-bezier(.45,0,.85,.6); }
+    31%       { opacity: 1; transform: translateY(0) rotate(220deg); animation-timing-function: ease-out; }
+    34%       { opacity: 1; transform: translateY(-14px) rotate(252deg); animation-timing-function: ease-in; }
+    38%       { opacity: 1; transform: translateY(2px) rotate(282deg); }
+    42%, 100% { opacity: 0; transform: translateY(12px) rotate(315deg) scale(.9); }
+  }
 
-        .day-text {
-            font-size: 32px; font-weight: 900; color: #1e293b;
-            display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
-        }
+  /* ================= РОСТОК ================= */
+  .sprout-svg{
+    position: absolute; left: 50%; bottom: 184px; width: 140px; height: 200px; margin-left: -70px; overflow: visible; z-index: 30;
+  }
+  .sprout-sway{
+    transform-box: view-box; transform-origin: 70px 196px; animation: swayGrow 5s 1 forwards;
+  }
+  @keyframes swayGrow{
+    0%, 76%  { transform: rotate(0deg); }
+    84%      { transform: rotate(-2.3deg); }
+    91%      { transform: rotate(1.7deg); }
+    96%      { transform: rotate(-.7deg); }
+    100%     { transform: rotate(0deg); }
+  }
+  .sprout-idle{
+    transform-box: view-box; transform-origin: 70px 196px; animation: swayIdle 2.8s ease-in-out 5s infinite;
+  }
+  @keyframes swayIdle{
+    0%   { transform: rotate(-1.7deg); }
+    50%  { transform: rotate(1.7deg); }
+    100% { transform: rotate(-1.7deg); }
+  }
 
-        .action-btn {
-            width: 85%; max-width: 350px; padding: 18px;
-            font-size: 18px; font-family: 'Nunito', sans-serif; font-weight: 900;
-            color: white; background-color: #58cc02;
-            border: none; border-radius: 16px;
-            box-shadow: 0 8px 0 #46a302;
-            cursor: pointer; transition: all 0.1s ease;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .action-btn:active { transform: translateY(8px); box-shadow: 0 0px 0 #46a302; }
+  .stem-path, .stem-hi { stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawStem 5s 1 forwards; }
+  @keyframes drawStem{ 0%, 44% { stroke-dashoffset: 100; } 66%, 100% { stroke-dashoffset: 0; } }
+  
+  .stem-node{ opacity: 0; animation: nodeIn 5s 1 forwards; }
+  @keyframes nodeIn{ 0%, 56% { opacity: 0; } 64%, 100% { opacity: .85; } }
+  
+  .leaf-left{ transform-box: fill-box; transform-origin: 100% 100%; animation: leafL 5s 1 forwards; }
+  @keyframes leafL{ 0%, 57% { opacity: 0; transform: scale(.04) rotate(-12deg); } 64% { opacity: 1; transform: scale(1.14) rotate(2deg); } 68%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+  
+  .leaf-right{ transform-box: fill-box; transform-origin: 0% 100%; animation: leafR 5s 1 forwards; }
+  @keyframes leafR{ 0%, 61% { opacity: 0; transform: scale(.04) rotate(12deg); } 68% { opacity: 1; transform: scale(1.14) rotate(-2deg); } 72%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+  
+  .leaf-bud{ transform-box: fill-box; transform-origin: 50% 100%; animation: leafB 5s 1 forwards; }
+  @keyframes leafB{ 0%, 67% { opacity: 0; transform: scale(.04) rotate(8deg); } 74% { opacity: 1; transform: scale(1.16) rotate(-2deg); } 78%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
 
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  /* ================= ТЕКСТ И КНОПКА ================= */
+  .caption{
+    text-align: center; opacity: 0;
+    animation: capIn .9s cubic-bezier(.22,.9,.3,1) 5.2s 1 forwards;
+    margin-bottom: 50px;
+  }
+  @keyframes capIn{ from{ opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* Второй экран (заглушка) */
-        #main-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 100;
-        }
-        #main-screen.active { opacity: 1; pointer-events: auto; }
-        #main-screen h1 { font-size: 32px; font-weight: 900; }
-    </style>
+  .day{
+    font-size: 42px; font-weight: 900; color: #1e293b;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(255,255,255,0.5);
+  }
+
+  .cta{
+    display: inline-block; padding: 18px 36px;
+    font-size: 18px; font-family: 'Nunito', sans-serif; font-weight: 900;
+    color: white; background-color: #58cc02;
+    border: none; border-radius: 16px;
+    box-shadow: 0 8px 0 #46a302;
+    cursor: pointer; transition: all 0.1s ease;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .cta:active { transform: translateY(8px); box-shadow: 0 0px 0 #46a302; }
+
+  /* --- ЭКРАН 2: ГЛАВНЫЙ (ДЕРЕВО) --- */
+  #main-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 5;
+  }
+  #main-screen.active { opacity: 1; pointer-events: auto; }
+  
+  #main-screen h1 { font-size: 34px; font-weight: 900; margin-top: 50px; color: #1e293b;}
+  
+  /* Дерево (взято из прошлого шага) */
+  .tree-scene { position: relative; width: 280px; height: 320px; display: flex; justify-content: center; align-items: flex-end; margin-top: 10px; }
+  .tree-svg { width: 100%; height: 100%; transition: all 0.8s ease; transform-origin: bottom center; }
+  .alive .tree-svg { animation: sway 4s ease-in-out infinite alternate; }
+  @keyframes sway { 0% { transform: rotate(-3deg); } 100% { transform: rotate(3deg); } }
+  .trunk { fill: url(#trunkGradient); transition: fill 0.5s; }
+  .leaf { fill: url(#leafGradient); transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
+  .withered .trunk { fill: #78716c; }
+  .withered .leaf { fill: #a8a29e; transform: translateY(150px) rotate(90deg) scale(0.5); opacity: 0; }
+
+  .action-btn {
+      width: 85%; max-width: 350px; padding: 18px; margin-top: 30px;
+      font-size: 18px; font-family: 'Nunito', sans-serif; font-weight: 900;
+      color: white; background-color: #58cc02;
+      border: none; border-radius: 16px;
+      box-shadow: 0 8px 0 #46a302;
+      cursor: pointer; transition: all 0.1s ease;
+  }
+  .action-btn:active { transform: translateY(8px); box-shadow: 0 0px 0 #46a302; }
+</style>
 </head>
 <body>
 
+  <!-- ЭКРАН 1: АНИМАЦИЯ -->
+  <div id="intro-screen">
     <div class="stage">
+      <div class="scene">
         <div class="shadow"></div>
-
         <div class="pot-wrap">
-            <div class="pot-body"></div>
-            <div class="pot-rim"></div>
-            <div class="rim-inner"></div>
-            <div class="rim-shine"></div>
-            <div class="pot-soil"></div>
+          <div class="pot-body"></div><div class="pot-rim"></div><div class="rim-inner"></div><div class="rim-shine"></div><div class="pot-soil"></div>
         </div>
-
-        <div class="dust">
-            <i></i><i></i><i></i><i></i><i></i><i></i>
-        </div>
-
+        <div class="dust"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="seed"></div>
-
         <svg class="sprout-svg" viewBox="0 0 140 200" aria-hidden="true">
-            <defs>
-                <linearGradient id="g-stem" x1="0" y1="1" x2="0" y2="0">
-                    <stop offset="0%"   stop-color="#175c17"/>
-                    <stop offset="45%"  stop-color="#2e9b2e"/>
-                    <stop offset="100%" stop-color="#8ce88c"/>
-                </linearGradient>
-                <linearGradient id="g-leafL" x1="1" y1="1" x2="0" y2="0">
-                    <stop offset="0%"   stop-color="#2b8f2b"/>
-                    <stop offset="50%"  stop-color="#5dd45d"/>
-                    <stop offset="100%" stop-color="#b3f8b3"/>
-                </linearGradient>
-                <linearGradient id="g-leafR" x1="0" y1="1" x2="1" y2="0">
-                    <stop offset="0%"   stop-color="#2b8f2b"/>
-                    <stop offset="50%"  stop-color="#5dd45d"/>
-                    <stop offset="100%" stop-color="#b3f8b3"/>
-                </linearGradient>
-            </defs>
-
-            <g class="sprout-sway">
-                <path class="stem-path" pathLength="100" d="M70,196 C71,172 67,150 69,128 C71,110 66,86 68,60" fill="none" stroke="url(#g-stem)" stroke-width="8" stroke-linecap="round"/>
-                <path class="stem-hi" pathLength="100" d="M67.5,196 C68.5,172 64.5,150 66.5,128 C68.5,110 63.5,86 65.5,60" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="2.2" stroke-linecap="round"/>
-                <ellipse class="stem-node" cx="69.5" cy="163" rx="5" ry="2.2" fill="#2c8c2c"/>
-                <g class="leaf-left">
-                    <path d="M69,128 C54,128 36,118 30,96 C44,90 60,102 69,122 Z" fill="url(#g-leafL)"/>
-                    <path d="M68,125 L33,98" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
-                    <path d="M56,113 L50,104 M46,105 L39,99 M60,119 L57,111" stroke="#2f8f2f" stroke-width="1" fill="none" opacity=".35" stroke-linecap="round"/>
-                </g>
-                <g class="leaf-right">
-                    <path d="M68,96 C82,96 100,86 106,64 C92,58 76,70 68,90 Z" fill="url(#g-leafR)"/>
-                    <path d="M69,93 L103,66" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
-                    <path d="M82,82 L90,74 M92,76 L99,71 M78,88 L76,80" stroke="#2f8f2f" stroke-width="1" fill="none" opacity=".35" stroke-linecap="round"/>
-                </g>
-                <g class="leaf-bud">
-                    <path d="M68,64 C63,56 60,46 62,34 C69,38 73,50 68,60 Z" fill="url(#g-leafR)"/>
-                    <path d="M67,60 L64,40" stroke="#3aa33a" stroke-width="1" fill="none" opacity=".45" stroke-linecap="round"/>
-                </g>
+          <defs>
+            <linearGradient id="g-stem" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#175c17"/><stop offset="45%" stop-color="#2e9b2e"/><stop offset="100%" stop-color="#8ce88c"/></linearGradient>
+            <linearGradient id="g-leafL" x1="1" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#2b8f2b"/><stop offset="50%" stop-color="#5dd45d"/><stop offset="100%" stop-color="#b3f8b3"/></linearGradient>
+            <linearGradient id="g-leafR" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#2b8f2b"/><stop offset="50%" stop-color="#5dd45d"/><stop offset="100%" stop-color="#b3f8b3"/></linearGradient>
+          </defs>
+          <g class="sprout-sway">
+            <g class="sprout-idle">
+              <path class="stem-path" pathLength="100" d="M70,196 C71,172 67,150 69,128 C71,110 66,86 68,60" fill="none" stroke="url(#g-stem)" stroke-width="8" stroke-linecap="round"/>
+              <path class="stem-hi" pathLength="100" d="M67.5,196 C68.5,172 64.5,150 66.5,128 C68.5,110 63.5,86 65.5,60" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="2.2" stroke-linecap="round"/>
+              <ellipse class="stem-node" cx="69.5" cy="163" rx="5" ry="2.2" fill="#2c8c2c"/>
+              <g class="leaf-left">
+                <path d="M69,128 C54,128 36,118 30,96 C44,90 60,102 69,122 Z" fill="url(#g-leafL)"/>
+                <path d="M68,125 L33,98" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
+                <path d="M56,113 L50,104 M46,105 L39,99 M60,119 L57,111" stroke="#2f8f2f" stroke-width="1" fill="none" opacity=".35" stroke-linecap="round"/>
+              </g>
+              <g class="leaf-right">
+                <path d="M68,96 C82,96 100,86 106,64 C92,58 76,70 68,90 Z" fill="url(#g-leafR)"/>
+                <path d="M69,93 L103,66" stroke="#2f8f2f" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
+                <path d="M82,82 L90,74 M92,76 L99,71 M78,88 L76,80" stroke="#2f8f2f" stroke-width="1" fill="none" opacity=".35" stroke-linecap="round"/>
+              </g>
+              <g class="leaf-bud">
+                <path d="M68,64 C63,56 60,46 62,34 C69,38 73,50 68,60 Z" fill="url(#g-leafR)"/>
+                <path d="M67,60 L64,40" stroke="#3aa33a" stroke-width="1" fill="none" opacity=".45" stroke-linecap="round"/>
+              </g>
             </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="caption">
+      <div class="day">День 1 🔥</div>
+      <button type="button" class="cta" id="start-btn">Начать заниматься</button>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 2: ГЛАВНЫЙ -->
+  <div id="main-screen">
+    <h1>Grownilgo 🌳</h1>
+    <div class="tree-scene alive" id="treeContainer">
+        <svg class="tree-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="trunkGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#78350f" /><stop offset="50%" stop-color="#b45309" /><stop offset="100%" stop-color="#78350f" /></linearGradient>
+                <radialGradient id="leafGradient" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#86efac" /><stop offset="100%" stop-color="#16a34a" /></radialGradient>
+            </defs>
+            <path class="trunk" d="M90,250 L110,250 L105,130 L95,130 Z" />
+            <path class="trunk" d="M100,160 L60,130 L55,140 L100,170 Z" />
+            <path class="trunk" d="M100,180 L140,140 L145,150 L100,190 Z" />
+            <circle class="leaf" cx="100" cy="100" r="45" /><circle class="leaf" cx="60" cy="120" r="35" /><circle class="leaf" cx="140" cy="120" r="35" />
+            <circle class="leaf" cx="80" cy="70" r="30" /><circle class="leaf" cx="120" cy="70" r="30" />
+            <circle class="leaf" cx="85" cy="85" r="15" opacity="0.6" fill="#bbf7d0" /><circle class="leaf" cx="130" cy="105" r="10" opacity="0.6" fill="#bbf7d0" />
         </svg>
     </div>
+    <button class="action-btn" id="actionBtn">Проверить, как сохнет</button>
+  </div>
 
-    <!-- Текст и кнопка, которые появляются в конце анимации -->
-    <div class="ui-container">
-        <div class="day-text">День 1 🔥</div>
-        <button class="action-btn" id="start-btn">Изучать английский</button>
-    </div>
+  <script>
+    // 1. Инициализация Telegram
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.ready(); tg.expand(); }
 
-    <!-- Второй экран (пока просто заглушка) -->
-    <div id="main-screen">
-        <h1>Главный экран 🌳</h1>
-        <p>Здесь скоро появятся уроки!</p>
-    </div>
-
-    <script>
-        // Инициализация Telegram
-        const tg = window.Telegram?.WebApp;
-        if (tg) { tg.ready(); tg.expand(); }
-
-        // Переход на главный экран
-        document.getElementById('start-btn').addEventListener('click', () => {
+    // 2. Переход на главный экран
+    document.getElementById('start-btn').addEventListener('click', () => {
+        document.getElementById('intro-screen').classList.add('hidden');
+        setTimeout(() => {
             document.getElementById('main-screen').classList.add('active');
-        });
-    </script>
+        }, 400);
+    });
+
+    // 3. Логика увядания дерева (для второго экрана)
+    const treeContainer = document.getElementById('treeContainer');
+    const actionBtn = document.getElementById('actionBtn');
+
+    actionBtn.addEventListener('click', () => {
+        if (treeContainer.classList.contains('alive')) {
+            treeContainer.classList.remove('alive');
+            treeContainer.classList.add('withered');
+            actionBtn.textContent = 'Оживить дерево';
+            actionBtn.style.backgroundColor = '#3b82f6';
+            actionBtn.style.boxShadow = '0 8px 0 #1e3a8a';
+        } else {
+            treeContainer.classList.remove('withered');
+            treeContainer.classList.add('alive');
+            actionBtn.textContent = 'Проверить, как сохнет';
+            actionBtn.style.backgroundColor = '#58cc02';
+            actionBtn.style.boxShadow = '0 8px 0 #46a302';
+        }
+    });
+  </script>
 </body>
 </html>
